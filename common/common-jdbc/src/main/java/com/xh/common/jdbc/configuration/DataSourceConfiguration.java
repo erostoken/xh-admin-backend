@@ -2,6 +2,7 @@ package com.xh.common.jdbc.configuration;
 
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -52,6 +53,7 @@ public class DataSourceConfiguration {
      */
     @Bean("secondDataSourceProperties")
     @ConfigurationProperties("spring.datasource.second")
+    @ConditionalOnProperty(prefix = "spring.datasource.second", name = "enabled", havingValue = "true")
     public DataSourceProperties secondDataSourceProperties() {
         return new DataSourceProperties();
     }
@@ -61,6 +63,7 @@ public class DataSourceConfiguration {
      */
     @Bean("secondDataSource")
     @ConfigurationProperties("spring.datasource.second.configuration")
+    @ConditionalOnProperty(prefix = "spring.datasource.second", name = "enabled", havingValue = "true")
     public DataSource secondDataSource(@Qualifier("secondDataSourceProperties") DataSourceProperties properties) {
         return properties.initializeDataSourceBuilder().type(HikariDataSource.class).build();
     }
@@ -69,6 +72,7 @@ public class DataSourceConfiguration {
      * 第二数据源JdbcTemplate
      */
     @Bean
+    @ConditionalOnProperty(prefix = "spring.datasource.second", name = "enabled", havingValue = "true")
     public JdbcTemplate secondJdbcTemplate(@Qualifier("secondDataSource") DataSource dataSource) {
         return new JdbcTemplate(dataSource);
     }

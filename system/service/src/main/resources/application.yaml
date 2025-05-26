@@ -13,17 +13,17 @@ spring:
       - http://192.168.**
   datasource:
     first:
-      url: jdbc:mysql://localhost:3306/bms?characterEncoding=utf-8
+      url: jdbc:mysql://localhost:3306/xh_admin?serverTimezone=GMT%2B8&useSSL=false&allowPublicKeyRetrieval=true&zeroDateTimeBehavior=convertToNull&allowMultiQueries=true
       username: root
-      password: 123456
+      password: local123
       configuration:
         maximum-pool-size: 20
-    second:
-      url: jdbc:postgresql://localhost:5432/bms
-      username: postgres
-      password: 123456
-      configuration:
-        maximum-pool-size: 20
+#    second:
+#      url: jdbc:postgresql://localhost:5432/bms
+#      username: postgres
+#      password: 123456
+#      configuration:
+#        maximum-pool-size: 20
   data:
     redis:
       host: localhost

@@ -51,10 +51,10 @@
         </dependency>
 
         <!-- 使用nacos作为配置中心和注册中心 -->
-        <dependency>
-            <groupId>com.xh</groupId>
-            <artifactId>common-nacos</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.xh</groupId>-->
+<!--            <artifactId>common-nacos</artifactId>-->
+<!--        </dependency>-->
     </dependencies>
 
     <build>
