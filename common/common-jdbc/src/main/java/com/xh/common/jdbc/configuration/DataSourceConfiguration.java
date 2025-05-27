@@ -23,6 +23,7 @@ public class DataSourceConfiguration {
     /**
      * 第一数据源配置信息
      */
+    @Primary
     @Bean("firstDataSourceProperties")
     @ConfigurationProperties("spring.datasource.first")
     public DataSourceProperties firstDataSourceProperties() {

@@ -42,6 +42,18 @@ spring:
   devtools:
     livereload:
       enabled: true
+  #  邮箱配置 todo 修改为自己的邮箱发送配置 password为邮箱授权码
+  mail:
+    host: smtp.qq.com
+    username: 2483482026@qq.com
+    password: 邮箱授权码
+    emailFrom: 2483482026@qq.com
+    properties:
+      mail:
+        smtp:
+          ssl:
+            enable: true
+
 xxl:
   job:
     admin:
@@ -55,3 +67,23 @@ minio:
   access-key: QEGiz63wnKckxgmvTwre
   secret-key: CoWs7QBrFjsEonoFjkOx9eQhZGfE74n9VlmVNMOM
   bucket: bucket1
+
+# mybatis-plus配置
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath*:mapper/**/*.xml
+
+# 支付宝支付配置 todo
+alipay:
+  appId: 2019xxx41568
+  sellerId: 20xxx90687
+  #是否沙箱环境
+  sandbox: false
+  #本地测试用内网穿透，这个内网穿透地址，修改为自己的。上线修改为后端的接口地址即可
+  notifyUrl: https://beloved-massive-sheepdog.ngrok-free.app/api/order/notify/order
+  #支付成功后跳转地址,上线修改为上线任意地址
+  returnUrl: http://localhost:8000/account/center
+  private-key: xxxxxxxxxx
+  ali-pay-public-key: xxxxxxxxxxxxxxxx

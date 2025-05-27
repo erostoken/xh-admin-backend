@@ -52,7 +52,9 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/api/**")
                 .allowedOriginPatterns(allowedOriginPatterns)
                 .allowedMethods("POST", "PUT", "GET", "OPTIONS", "DELETE")
-                .maxAge(3600);
+                .allowedHeaders("*")
+                .maxAge(3600)
+                .allowCredentials(true);
     }
 
     /**
@@ -80,7 +82,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "/swagger-ui.html",
                         "/swagger-ui.html/**",
                         "/swagger-ui/**",
-                        "/v3/**"
+                        "/v3/**",
+                        "/api/**"
                 );
     }
 

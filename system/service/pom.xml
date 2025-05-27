@@ -49,12 +49,46 @@
             <groupId>com.xh</groupId>
             <artifactId>system-client</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.xh</groupId>
+            <artifactId>api-sdk</artifactId>
+            <version>${xh-admin.version}</version>
+        </dependency>
 
         <!-- 使用nacos作为配置中心和注册中心 -->
 <!--        <dependency>-->
 <!--            <groupId>com.xh</groupId>-->
 <!--            <artifactId>common-nacos</artifactId>-->
 <!--        </dependency>-->
+
+        <!-- 业务 start -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+            <version>3.5.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson</artifactId>
+            <version>3.22.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>jakarta.mail</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.github.javen205/IJPay-AliPay -->
+        <dependency>
+            <groupId>com.github.javen205</groupId>
+            <artifactId>IJPay-AliPay</artifactId>
+            <version>2.9.5</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.binarywang</groupId>
+            <artifactId>weixin-java-pay</artifactId>
+            <version>4.5.0</version>
+        </dependency>
+        <!-- 业务 end -->
     </dependencies>
 
     <build>

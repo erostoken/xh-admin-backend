@@ -1,0 +1,27 @@
+package com.xh.business.domain.req.productorder;
+
+import java.io.Serializable;
+import lombok.Data;
+
+/**
+ * @Author: QiMu
+ * @Date: 2023/08/25 05:00:08
+ * @Version: 1.0
+ * @Description: 付款创建请求
+ */
+@Data
+public class ProductOrderCreateRequest implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * 接口id
+     */
+    private String productId;
+
+    /**
+     * 支付类型
+     */
+    private String payType;
+
+}

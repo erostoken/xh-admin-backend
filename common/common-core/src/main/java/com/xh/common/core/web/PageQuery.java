@@ -57,6 +57,10 @@ public class PageQuery<T> {
      */
     private LinkedList<Object> args = new LinkedList<>();
 
+    public PageQuery() {
+        this.orderDirection = OrderDirection.desc;
+    }
+
     /**
      * 尾部添加参数
      */

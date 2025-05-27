@@ -6,11 +6,28 @@ package com.xh.common.core.web;
  */
 public class MyException extends RuntimeException {
 
-    public MyException(String message) {
+    private final int code;
+
+    public MyException(int code, String message) {
         super(message);
+        this.code = code;
+    }
+
+    public MyException(String message) {
+        this(500, message);
+    }
+
+    public MyException(int code, Throwable e) {
+        super(e);
+        this.code = code;
     }
 
     public MyException(Throwable e) {
-        super(e);
+        this(500, e);
     }
+
+    public int getCode() {
+        return code;
+    }
+
 }

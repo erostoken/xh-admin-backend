@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xh.business.mapper.ApiPaymentInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.xh.business.domain.model.ApiPaymentInfo">
+            <id property="id" column="id" />
+            <result property="orderNo" column="order_no" />
+            <result property="transactionId" column="transaction_id" />
+            <result property="tradeType" column="trade_type" />
+            <result property="tradeState" column="trade_state" />
+            <result property="tradeStateDesc" column="trade_state_desc" />
+            <result property="successTime" column="success_time" />
+            <result property="openid" column="openid" />
+            <result property="payerTotal" column="payer_total" />
+            <result property="currency" column="currency" />
+            <result property="payerCurrency" column="payer_currency" />
+            <result property="content" column="content" />
+            <result property="total" column="total" />
+            <result property="createTime" column="create_time" />
+            <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,order_no,transaction_id,trade_type,trade_state,trade_state_desc,
+        success_time,openid,payer_total,currency,payer_currency,
+        content,total,create_time,update_time
+    </sql>
+</mapper>
