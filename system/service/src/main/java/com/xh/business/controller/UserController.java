@@ -4,6 +4,7 @@ import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.xh.business.config.EmailConfig;
@@ -28,8 +29,11 @@ import com.xh.business.service.ApiUserService;
 import com.xh.business.utils.BusinessException;
 import com.xh.business.utils.EmailUtil;
 import com.xh.business.utils.ErrorCode;
+import com.xh.common.core.dto.OnlineUserDTO;
+import com.xh.common.core.utils.LoginUtil;
 import com.xh.common.core.web.DeleteRequest;
 import com.xh.common.core.web.IdRequest;
+import com.xh.common.core.web.PageQuery;
 import com.xh.common.core.web.RestResponse;
 import jakarta.annotation.Resource;
 import jakarta.mail.MessagingException;
@@ -51,6 +55,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -262,11 +267,14 @@ public class UserController {
         // 校验
         userService.validUser(user, true);
 
-        boolean result = userService.save(user);
-        if (!result) {
-            throw new BusinessException(ErrorCode.OPERATION_ERROR);
-        }
-        return RestResponse.success(user.getId());
+        // 调用用户注册
+        UserRegisterRequest userRegisterRequest = new UserRegisterRequest();
+        userRegisterRequest.setUserAccount(userAddRequest.getUserAccount());
+        userRegisterRequest.setUserPassword(userAddRequest.getUserPassword());
+        userRegisterRequest.setUserName(userAddRequest.getUserName());
+        userRegisterRequest.setCheckPassword(userAddRequest.getUserPassword());
+        userService.userRegister(userRegisterRequest);
+        return RestResponse.success();
     }
 
     /**
@@ -288,28 +296,26 @@ public class UserController {
      * 更新用户
      *
      * @param userUpdateRequest 用户更新请求
-     * @param request           请求
      * @return {@link RestResponse}<{@link ApiUser}>
      */
     @PostMapping("/update")
     @Transactional(rollbackFor = Exception.class)
-    public RestResponse<UserVO> updateUser(@RequestBody UserUpdateRequest userUpdateRequest, HttpServletRequest request) {
+    public RestResponse<UserVO> updateUser(@RequestBody UserUpdateRequest userUpdateRequest) {
         if (ObjectUtils.anyNull(userUpdateRequest, userUpdateRequest.getId()) || userUpdateRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
 
         // 管理员才能操作
-        boolean adminOperation = ObjectUtils.isNotEmpty(userUpdateRequest.getBalance())
-                || StringUtils.isNoneBlank(userUpdateRequest.getUserRole())
-                || StringUtils.isNoneBlank(userUpdateRequest.getUserPassword());
+        boolean adminOperation = ObjectUtils.anyNull(userUpdateRequest.getBalance(),
+                userUpdateRequest.getUserRole(), userUpdateRequest.getUserPassword());
         // 校验是否登录
-        UserVO loginUser = userService.getLoginUser(request);
+        OnlineUserDTO onlineUserInfo = LoginUtil.getOnlineUserInfo();
         // 处理管理员业务,不是管理员抛异常
-        if (adminOperation && !loginUser.getUserRole().equals(ADMIN_ROLE)) {
+        if (adminOperation && !onlineUserInfo.isAdmin()) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
 
-        if (!loginUser.getUserRole().equals(ADMIN_ROLE) && !userUpdateRequest.getId().equals(loginUser.getId())) {
+        if (!onlineUserInfo.isAdmin() && !userUpdateRequest.getId().equals(onlineUserInfo.getUserId())) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "只有本人或管理员可以修改");
         }
 
@@ -338,7 +344,7 @@ public class UserController {
      * @return {@link RestResponse}<{@link UserVO}>
      */
     @GetMapping("/get")
-    public RestResponse<UserVO> getUserById(int id, HttpServletRequest request) {
+    public RestResponse<UserVO> getUserById(@RequestParam int id, HttpServletRequest request) {
         if (id <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -380,28 +386,29 @@ public class UserController {
      * @param request          请求
      * @return {@link RestResponse}<{@link Page}<{@link UserVO}>>
      */
-    @GetMapping("/list/page")
-    public RestResponse<Page<UserVO>> listUserByPage(UserQueryRequest userQueryRequest, HttpServletRequest request) {
+    @PostMapping("/list/page")
+    public RestResponse<Page<UserVO>> listUserByPage(@RequestBody PageQuery<UserQueryRequest> userQueryRequest, HttpServletRequest request) {
         ApiUser userQuery = new ApiUser();
         if (userQueryRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
 
-        BeanUtils.copyProperties(userQueryRequest, userQuery);
-
-        String userName = userQueryRequest.getUserName();
-        String userAccount = userQueryRequest.getUserAccount();
-        String gender = userQueryRequest.getGender();
-        String userRole = userQueryRequest.getUserRole();
+        // 将条件复制给query
+        BeanUtils.copyProperties(userQueryRequest.getParam(), userQuery);
         long current = userQueryRequest.getCurrentPage();
         long pageSize = userQueryRequest.getPageSize();
 
-        QueryWrapper<ApiUser> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like(StringUtils.isNotBlank(userName), "userName", userName)
-                .eq(StringUtils.isNotBlank(userAccount), "userAccount", userAccount)
-                .eq(StringUtils.isNotBlank(gender), "gender", gender)
-                .eq(StringUtils.isNotBlank(userRole), "userRole", userRole);
-        Page<ApiUser> userPage = userService.page(new Page<>(current, pageSize), queryWrapper);
+        String userName = userQuery.getUserName();
+        String userEmail = userQuery.getEmail();
+        String userAccount = userQuery.getUserAccount();
+        String gender = userQuery.getGender();
+        String userRole = userQuery.getUserRole();
+        Page<ApiUser> userPage = userService.page(new Page<>(current, pageSize), Wrappers.<ApiUser>lambdaQuery()
+                .like(StringUtils.isNotBlank(userName), ApiUser::getUserName, userName)
+                .like(StringUtils.isNotBlank(userEmail), ApiUser::getEmail, userEmail)
+                .like(StringUtils.isNotBlank(userAccount), ApiUser::getUserAccount, userAccount)
+                .eq(StringUtils.isNotBlank(gender), ApiUser::getGender, gender)
+                .eq(StringUtils.isNotBlank(userRole), ApiUser::getUserRole, userRole));
         Page<UserVO> userVoPage = new PageDTO<>(userPage.getCurrent(), userPage.getSize(), userPage.getTotal());
         List<UserVO> userVOList = userPage.getRecords().stream().map(user -> {
             UserVO userVO = new UserVO();

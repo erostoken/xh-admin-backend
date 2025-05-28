@@ -11,10 +11,8 @@ import lombok.EqualsAndHashCode;
  * @Version: 1.0
  * @Description: 用户查询请求
  */
-@EqualsAndHashCode(callSuper = true)
 @Data
-public class UserQueryRequest extends PageQuery implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class UserQueryRequest implements Serializable {
     /**
      * id
      */
@@ -27,7 +25,10 @@ public class UserQueryRequest extends PageQuery implements Serializable {
      * 账号
      */
     private String userAccount;
-
+    /**
+     * 邮箱
+     */
+    private String email;
     /**
      * 性别
      */

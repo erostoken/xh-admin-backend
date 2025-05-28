@@ -25,6 +25,10 @@ public class UserUpdateRequest implements Serializable {
      */
     private String userAccount;
     /**
+     * 用户邮箱
+     */
+    private String email;
+    /**
      * 用户头像
      */
     private String userAvatar;
@@ -44,9 +48,8 @@ public class UserUpdateRequest implements Serializable {
      * 密码
      */
     private String userPassword;
-
     /**
      * 钱包余额（分）
      */
-    private Integer balance;
+    private Long balance;
 }

@@ -35,10 +35,11 @@ public class UserVO implements Serializable {
      * 账号状态（0- 正常 1- 封号）
      */
     private Integer status;
+
     /**
      * 钱包余额（分）
      */
-    private Integer balance;
+    private Long balance;
 
     /**
      * 账号

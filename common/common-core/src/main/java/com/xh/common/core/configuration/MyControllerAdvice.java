@@ -24,7 +24,7 @@ public class MyControllerAdvice {
     @ResponseStatus(HttpStatus.OK)
     @ExceptionHandler(MyException.class)
     public RestResponse<?> handleControllerException(MyException ex) {
-        log.info("{} {}", ex.getStackTrace()[0].toString(), ex.getMessage());
+        log.info("{}", ex.getStackTrace()[0].toString(), ex);
         RestResponse<String> response = RestResponse.error(ex.getMessage());
         response.setHttpCode(HttpStatus.OK.value());
         return response;

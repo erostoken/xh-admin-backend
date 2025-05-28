@@ -48,4 +48,15 @@ public class OnlineUserDTO implements Serializable {
     private String orgName;
     @Schema(title = "当前使用角色名称")
     private String roleName;
+    @Schema(title = "管理员权限1：是，0：否")
+    private Integer adminFlag;
+
+    /**
+     * 是否是管理员
+     *
+     * @return true: 是 false: 否
+     */
+    public Boolean isAdmin() {
+        return 1 == adminFlag;
+    }
 }

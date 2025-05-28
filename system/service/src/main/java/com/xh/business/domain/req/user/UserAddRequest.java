@@ -1,5 +1,6 @@
 package com.xh.business.domain.req.user;
 
+import com.xh.business.domain.enums.UserAccountStatusEnum;
 import java.io.Serializable;
 import lombok.Data;
 
@@ -38,8 +39,7 @@ public class UserAddRequest implements Serializable {
      */
     private String userPassword;
 
-    /**
-     * 钱包余额（分）
-     */
-    private Integer balance;
+    public UserAddRequest() {
+        this.userRole = "user";
+    }
 }

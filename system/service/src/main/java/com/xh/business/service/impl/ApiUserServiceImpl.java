@@ -22,6 +22,7 @@ import com.xh.business.utils.RedissonLockUtil;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Random;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
@@ -92,9 +93,7 @@ public class ApiUserServiceImpl extends ServiceImpl<ApiUserMapper, ApiUser>
         String redissonLock = ("userRegister_" + userAccount).intern();
         return redissonLockUtil.redissonDistributedLocks(redissonLock, () -> {
             // 账户不能重复
-            QueryWrapper<ApiUser> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("userAccount", userAccount);
-            long count = this.getBaseMapper().selectCount(queryWrapper);
+            long count = this.lambdaQuery().eq(ApiUser::getUserAccount, userAccount).count();
             if (count > 0) {
                 throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号重复");
             }
@@ -121,6 +120,7 @@ public class ApiUserServiceImpl extends ServiceImpl<ApiUserMapper, ApiUser>
             user.setUserName(userName);
             user.setAccessKey(accessKey);
             user.setSecretKey(secretKey);
+            user.setBalance(0L);
             if (invitationCodeUser != null) {
                 user.setBalance(100L);
                 this.addWalletBalance(invitationCodeUser.getId(), 100L);
@@ -484,21 +484,22 @@ public class ApiUserServiceImpl extends ServiceImpl<ApiUserMapper, ApiUser>
         if (StringUtils.isNotBlank(userAccount) && !userAccount.matches(pattern)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号由数字、小写字母、大写字母组成");
         }
+        // 账户不能重复
+        if (StringUtils.isNotBlank(userAccount)) {
+            long count = this.lambdaQuery()
+                    .eq(ApiUser::getUserAccount, userAccount)
+                    .ne(Objects.nonNull(user.getId()), ApiUser::getId, user.getId())
+                    .count();
+            if (count > 0) {
+                throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号重复");
+            }
+        }
         if (ObjectUtils.isNotEmpty(balance) && balance < 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "钱包余额不能为负数");
         }
         if (StringUtils.isNotBlank(userPassword)) {
             String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
             user.setUserPassword(encryptPassword);
-        }
-        // 账户不能重复
-        if (StringUtils.isNotBlank(userAccount)) {
-            QueryWrapper<ApiUser> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("userAccount", userAccount);
-            long count = this.getBaseMapper().selectCount(queryWrapper);
-            if (count > 0) {
-                throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号重复");
-            }
         }
     }
 

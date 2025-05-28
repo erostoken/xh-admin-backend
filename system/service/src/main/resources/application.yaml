@@ -42,6 +42,8 @@ spring:
   devtools:
     livereload:
       enabled: true
+    restart:
+      additional-paths: src/main/java
   #  邮箱配置 todo 修改为自己的邮箱发送配置 password为邮箱授权码
   mail:
     host: smtp.qq.com

@@ -194,6 +194,7 @@ public class SysLoginService extends BaseServiceImpl {
             onlineUserDTO.setOrgName(orgRole.getOrgName());
             onlineUserDTO.setRoleName(orgRole.getRoleName());
             onlineUserDTO.setLoginTime(LocalDateTime.now());
+            onlineUserDTO.setAdminFlag(orgRole.getAdminFlag());
             StpUtil.getTokenSession().set(LoginUtil.SYS_USER_KEY, onlineUserDTO);
             return getCurrentLoginUserVO(true);
         } else {
@@ -333,7 +334,8 @@ public class SysLoginService extends BaseServiceImpl {
                         tem.*,
                         o.code org_code,
                         o.name org_name,
-                        r.name role_name
+                        r.name role_name,
+                        r.admin_flag admin_flag
                     from (
                         SELECT
                             sys_org_id, sys_role_id

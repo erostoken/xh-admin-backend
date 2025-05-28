@@ -29,4 +29,6 @@ public class SysOrgRoleDTO extends BaseDTO<Integer> {
     private String roleName;
     @Schema(title = "是否当前使用的角色")
     private Boolean active;
+    @Schema(title = "管理员权限1：是，0：否")
+    private Integer adminFlag;
 }
