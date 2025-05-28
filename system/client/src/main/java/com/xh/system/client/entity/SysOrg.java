@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
 @Table
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SysOrg extends BaseEntity<Integer> {
+public class SysOrg extends BaseEntity<Long> {
 
     @Schema(title = "机构代码")
     private String code;

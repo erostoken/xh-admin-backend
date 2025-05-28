@@ -33,7 +33,7 @@ public class SysLogController {
     @SaCheckPermission("system:log:detail")
     @Operation(description = "获取日志详情")
     @GetMapping("/get/{id}")
-    public RestResponse<SysLog> getById(@PathVariable Integer id) {
+    public RestResponse<SysLog> getById(@PathVariable Long id) {
         return RestResponse.success(sysLogService.getById(id));
     }
 

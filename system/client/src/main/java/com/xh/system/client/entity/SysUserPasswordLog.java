@@ -11,9 +11,9 @@ import lombok.EqualsAndHashCode;
 @Table
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SysUserPasswordLog extends BaseEntity<Integer> {
+public class SysUserPasswordLog extends BaseEntity<Long> {
     @Schema(title = "系统用户id")
-    private Integer sysUserId;
+    private Long sysUserId;
     @Schema(title = "原密码")
     private String oldPassword;
     @Schema(title = "新密码")

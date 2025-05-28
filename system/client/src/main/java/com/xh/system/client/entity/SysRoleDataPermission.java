@@ -11,14 +11,14 @@ import lombok.EqualsAndHashCode;
 @Table
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SysRoleDataPermission extends BaseEntity<Integer> {
+public class SysRoleDataPermission extends BaseEntity<Long> {
 
     @Schema(title = "角色ID")
-    private Integer sysRoleId;
+    private Long sysRoleId;
 
     @Schema(title = "数据实体ID")
     private String sysDataEntityId;
 
     @Schema(title = "数据权限ID")
-    private Integer sysDataPermissionId;
+    private Long sysDataPermissionId;
 }

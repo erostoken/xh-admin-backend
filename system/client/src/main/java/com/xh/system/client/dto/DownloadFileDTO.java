@@ -12,7 +12,7 @@ import lombok.Data;
 @Data
 public class DownloadFileDTO {
     @Schema(title = "文件表ID")
-    private Integer id;
+    private Long id;
     @Schema(title = "对象存储key")
     private String object;
     @Schema(title = "文件MIME类型")

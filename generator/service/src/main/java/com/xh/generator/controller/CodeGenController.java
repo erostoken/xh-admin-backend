@@ -55,7 +55,7 @@ public class CodeGenController {
     @SaCheckPermission(value = {"generator:edit", "generator:detail"}, mode = SaMode.OR)
     @Operation(description = "获取代码生成详情")
     @GetMapping("/get/{id}")
-    public RestResponse<GenTable> getById(@PathVariable Integer id) {
+    public RestResponse<GenTable> getById(@PathVariable Long id) {
         return RestResponse.success(codeGenService.getById(id));
     }
 
@@ -68,7 +68,7 @@ public class CodeGenController {
 
     @Operation(description = "生成代码")
     @PostMapping("/generate/{id}")
-    public void generate(@PathVariable Integer id) throws IOException, TemplateException {
+    public void generate(@PathVariable Long id) throws IOException, TemplateException {
         if (!"development".equals(env)) {
             throw new MyException("仅开发环境可操作！");
         }
@@ -77,7 +77,7 @@ public class CodeGenController {
 
     @Operation(description = "代码zip文件下载")
     @GetMapping("/getCodeZipFile/{id}")
-    public void getCodeZipFile(@PathVariable Integer id, HttpServletResponse response) throws IOException, TemplateException {
+    public void getCodeZipFile(@PathVariable Long id, HttpServletResponse response) throws IOException, TemplateException {
         codeGenService.getCodeZipFile(id, response.getOutputStream());
     }
 

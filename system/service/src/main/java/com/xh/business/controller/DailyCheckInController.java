@@ -1,6 +1,7 @@
 package com.xh.business.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.xh.business.domain.constant.PointsConstant;
 import com.xh.business.domain.model.ApiDailyCheckIn;
 import com.xh.business.domain.resp.user.UserVO;
 import com.xh.business.service.ApiDailyCheckInService;
@@ -60,7 +61,7 @@ public class DailyCheckInController {
             dailyCheckIn.setUserId(loginUser.getId());
             dailyCheckIn.setAddPoints(10L);
             boolean dailyCheckInResult = dailyCheckInService.save(dailyCheckIn);
-            boolean addWalletBalance = userService.addWalletBalance(loginUser.getId(), dailyCheckIn.getAddPoints());
+            boolean addWalletBalance = userService.addWalletBalance(loginUser.getId(), dailyCheckIn.getAddPoints(), PointsConstant.DAILY_SIGN_IN);
             boolean result = dailyCheckInResult & addWalletBalance;
             if (!result) {
                 throw new BusinessException(ErrorCode.OPERATION_ERROR);

@@ -42,7 +42,7 @@ public class SysDictController {
     @SaCheckPermission(value = {"system:dict:edit", "system:dict:detail"}, mode = SaMode.OR)
     @Operation(description = "获取字典明细详情")
     @GetMapping("/detail/get/{id}")
-    public RestResponse<SysDictDetail> getById(@PathVariable Integer id) {
+    public RestResponse<SysDictDetail> getById(@PathVariable Long id) {
         return RestResponse.success(sysDictService.getDictDetailById(id));
     }
 

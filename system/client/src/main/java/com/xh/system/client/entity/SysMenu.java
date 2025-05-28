@@ -11,9 +11,9 @@ import lombok.EqualsAndHashCode;
 @Data
 @Schema(title = "系统菜单")
 @EqualsAndHashCode(callSuper = true)
-public class SysMenu extends BaseEntity<Integer> {
+public class SysMenu extends BaseEntity<Long> {
     @Schema(title = "上级id")
-    private Integer parentId;
+    private Long parentId;
     @Schema(title = "菜单标题")
     private String title;
     @Schema(title = "路由名称")

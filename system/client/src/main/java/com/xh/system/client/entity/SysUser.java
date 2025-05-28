@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 @Table
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SysUser extends BaseEntity<Integer> {
+public class SysUser extends BaseEntity<Long> {
 
     @Schema(title = "用户代码")
     private String code;

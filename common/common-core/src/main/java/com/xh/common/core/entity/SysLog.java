@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Table
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SysLog extends BaseEntity<Integer> {
+public class SysLog extends BaseEntity<Long> {
     @Schema(title = "token")
     private String token;
 
@@ -69,13 +69,13 @@ public class SysLog extends BaseEntity<Integer> {
     private String localeLabel;
 
     @Schema(title = "使用机构ID")
-    private Integer sysOrgId;
+    private Long sysOrgId;
 
     @Schema(title = "使用机构名称")
     private String orgName;
 
     @Schema(title = "使用角色ID")
-    private Integer sysRoleId;
+    private Long sysRoleId;
 
     @Schema(title = "使用角色名称")
     private String roleName;

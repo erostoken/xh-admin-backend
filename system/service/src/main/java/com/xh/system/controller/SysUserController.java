@@ -108,7 +108,7 @@ public class SysUserController {
     @SaCheckPermission(value = {"system:user:edit", "system:user:detail"}, mode = SaMode.OR)
     @Operation(description = "获取用户详情")
     @GetMapping("/get/{id}")
-    public RestResponse<SysUser> getById(@PathVariable Integer id) {
+    public RestResponse<SysUser> getById(@PathVariable Long id) {
         return RestResponse.success(sysUserService.getById(id));
     }
 
@@ -153,7 +153,7 @@ public class SysUserController {
     @SaCheckPermission(value = {"system:userGroup:edit", "system:userGroup:detail"}, mode = SaMode.OR)
     @Operation(description = "id获取用户组详情")
     @GetMapping("/getUserGroup/{id}")
-    public RestResponse<SysUserGroup> getUserGroupById(@PathVariable Integer id) {
+    public RestResponse<SysUserGroup> getUserGroupById(@PathVariable Long id) {
         return RestResponse.success(sysUserService.getUserGroupById(id));
     }
 
@@ -183,7 +183,7 @@ public class SysUserController {
     @SaCheckPermission(value = {"system:user:detail"}, mode = SaMode.OR)
     @Operation(description = "id获取用户所在的所有用户组信息")
     @GetMapping("/getUserGroups/{id}")
-    public RestResponse<List<SysUserGroup>> getUserGroups(@PathVariable Integer id) {
+    public RestResponse<List<SysUserGroup>> getUserGroups(@PathVariable Long id) {
         return RestResponse.success(sysUserService.getUserGroups(id));
     }
 

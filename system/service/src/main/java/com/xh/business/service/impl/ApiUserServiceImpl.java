@@ -1,24 +1,33 @@
 package com.xh.business.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import static com.xh.business.domain.constant.EmailConstant.CAPTCHA_CACHE_KEY;
+import com.xh.business.domain.constant.PointsConstant;
 import com.xh.business.domain.enums.UserAccountStatusEnum;
 import com.xh.business.domain.model.ApiUser;
+import com.xh.business.domain.model.ApiUserPointRecord;
 import com.xh.business.domain.req.user.UserBindEmailRequest;
 import com.xh.business.domain.req.user.UserEmailLoginRequest;
 import com.xh.business.domain.req.user.UserEmailRegisterRequest;
+import com.xh.business.domain.req.user.UserPointsRequest;
+import com.xh.business.domain.req.user.UserQueryRequest;
 import com.xh.business.domain.req.user.UserRegisterRequest;
 import com.xh.business.domain.req.user.UserUnBindEmailRequest;
 import com.xh.business.domain.resp.user.UserVO;
 import com.xh.business.mapper.ApiUserMapper;
+import com.xh.business.service.ApiUserPointRecordService;
 import com.xh.business.service.ApiUserService;
 import com.xh.business.utils.BusinessException;
 import com.xh.business.utils.ErrorCode;
 import com.xh.business.utils.RedissonLockUtil;
+import com.xh.common.core.web.PageQuery;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
@@ -48,9 +57,10 @@ public class ApiUserServiceImpl extends ServiceImpl<ApiUserMapper, ApiUser>
     
     @Resource
     private RedisTemplate<String, String> redisTemplate;
-
     @Resource
     private RedissonLockUtil redissonLockUtil;
+    @Resource
+    private ApiUserPointRecordService apiUserPointRecordService;
 
     /**
      * 用户寄存器
@@ -519,7 +529,56 @@ public class ApiUserServiceImpl extends ServiceImpl<ApiUserMapper, ApiUser>
     }
 
     @Override
-    public boolean addWalletBalance(Long userId, Long addPoints) {
+    @Transactional(rollbackFor = Exception.class)
+    public boolean pointsChange(UserPointsRequest userPointsRequest) {
+        ApiUser apiUser = this.getById(userPointsRequest.getId());
+        if (apiUser == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+
+        String channel = PointsConstant.ADMIN_OPERATION;
+        String remark = userPointsRequest.getRemark();
+        // 积分变更方式 - 1: 新增 2:扣减 3:修改
+        switch (userPointsRequest.getType()) {
+            case 1:
+                this.addWalletBalance(userPointsRequest.getId(), userPointsRequest.getPoints(), channel, remark);
+                break;
+            case 2:
+                this.reduceWalletBalance(userPointsRequest.getId(), userPointsRequest.getPoints(), channel, remark);
+                break;
+            case 3:
+                long changePoints = apiUser.getBalance() - userPointsRequest.getPoints();
+                if(changePoints > 0) {
+                    this.addWalletBalance(userPointsRequest.getId(), changePoints, channel, remark);
+                } else {
+                    this.reduceWalletBalance(userPointsRequest.getId(), changePoints, channel, remark);
+                }
+                break;
+            default:
+                throw new BusinessException(ErrorCode.OPERATION_ERROR);
+        }
+        return false;
+    }
+
+    /**
+     * 添加钱包余额
+     *
+     * @param userId    用户id
+     * @param addPoints 添加点
+     * @param channel   渠道
+     * @param remark    备注
+     * @return boolean
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean addWalletBalance(Long userId, Long addPoints, String channel, String remark) {
+        ApiUserPointRecord apiUserPointRecord = new ApiUserPointRecord();
+        apiUserPointRecord.setUserId(userId);
+        apiUserPointRecord.setPoints(addPoints);
+        apiUserPointRecord.setChannel(channel);
+        apiUserPointRecord.setRemark(remark);
+        apiUserPointRecordService.save(apiUserPointRecord);
+
         LambdaUpdateWrapper<ApiUser> userLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
         userLambdaUpdateWrapper.eq(ApiUser::getId, userId);
         userLambdaUpdateWrapper.setSql("balance = balance + " + addPoints);
@@ -527,11 +586,63 @@ public class ApiUserServiceImpl extends ServiceImpl<ApiUserMapper, ApiUser>
     }
 
     @Override
-    public boolean reduceWalletBalance(Long userId, Long reduceScore) {
+    @Transactional(rollbackFor = Exception.class)
+    public boolean addWalletBalance(Long userId, Long addPoints, String channel) {
+        return this.addWalletBalance(userId, addPoints, channel, "");
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean addWalletBalance(Long userId, Long addPoints) {
+        return this.addWalletBalance(userId, addPoints, PointsConstant.SYSTEM_OPERATION, "");
+    }
+
+
+    /**
+     * 减少钱包余额
+     *
+     * @param userId      用户id
+     * @param reduceScore 减少的分数
+     * @param channel     渠道
+     * @param remark      备注
+     * @return boolean
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean reduceWalletBalance(Long userId, Long reduceScore, String channel, String remark) {
+        ApiUserPointRecord apiUserPointRecord = new ApiUserPointRecord();
+        apiUserPointRecord.setUserId(userId);
+        apiUserPointRecord.setPoints(-reduceScore);
+        apiUserPointRecord.setChannel(channel);
+        apiUserPointRecord.setRemark(remark);
+        apiUserPointRecordService.save(apiUserPointRecord);
+
         LambdaUpdateWrapper<ApiUser> userLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
         userLambdaUpdateWrapper.eq(ApiUser::getId, userId);
         userLambdaUpdateWrapper.setSql("balance = balance - " + reduceScore);
         return this.update(userLambdaUpdateWrapper);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean reduceWalletBalance(Long userId, Long reduceScore, String channel) {
+        return this.reduceWalletBalance(userId, reduceScore, channel, "");
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean reduceWalletBalance(Long userId, Long reduceScore) {
+        return this.reduceWalletBalance(userId, reduceScore, PointsConstant.SYSTEM_OPERATION, "");
+    }
+
+    @Override
+    public Page<ApiUserPointRecord> pointsPage(PageQuery<UserQueryRequest> userQueryRequest) {
+        UserQueryRequest param = userQueryRequest.getParam();
+
+        Long userId = param.getId();
+        Page<ApiUserPointRecord> page = new Page<>(userQueryRequest.getCurrentPage(), userQueryRequest.getPageSize());
+        return apiUserPointRecordService.page(page, Wrappers.<ApiUserPointRecord>lambdaQuery()
+                .eq(ApiUserPointRecord::getUserId, userId));
     }
 
     /**

@@ -12,12 +12,12 @@ import lombok.EqualsAndHashCode;
 @Data
 @Schema(title = "数据字典明细")
 @EqualsAndHashCode(callSuper = true)
-public class SysDictDetail extends BaseEntity<Integer> {
+public class SysDictDetail extends BaseEntity<Long> {
     @Schema(title = "字典类型ID")
-    private Integer sysDictTypeId;
+    private Long sysDictTypeId;
 
     @Schema(title = "上级id")
-    private Integer parentId;
+    private Long parentId;
 
     @Schema(title = "字典值key")
     private String value;

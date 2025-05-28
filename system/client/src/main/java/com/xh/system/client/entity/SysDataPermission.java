@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 @Table
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SysDataPermission extends BaseEntity<Integer> {
+public class SysDataPermission extends BaseEntity<Long> {
     @Schema(title = "数据权限名称")
     private String name;
 

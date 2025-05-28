@@ -44,7 +44,7 @@ public class SysRoleController {
     @SaCheckPermission(value = {"system:role:edit", "system:role:detail"}, mode = SaMode.OR)
     @Operation(description = "获取角色详情")
     @GetMapping("/get/{id}")
-    public RestResponse<SysRole> getById(@PathVariable Integer id) {
+    public RestResponse<SysRole> getById(@PathVariable Long id) {
         return RestResponse.success(sysRoleService.getById(id));
     }
 

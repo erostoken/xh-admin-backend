@@ -14,9 +14,9 @@ import lombok.EqualsAndHashCode;
 @Data
 public class SysMenuDTO extends BaseDTO<Integer> {
     @Schema(title = "角色id")
-    private Integer roleId;
+    private Long roleId;
     @Schema(title = "上级id")
-    private Integer parentId;
+    private Long parentId;
     @Schema(title = "菜单标题")
     private String title;
     @Schema(title = "路由名称")

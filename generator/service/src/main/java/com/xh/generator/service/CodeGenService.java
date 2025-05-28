@@ -324,8 +324,8 @@ public class CodeGenService extends BaseServiceImpl {
                 genCodeResult.setErrorMsg("系统菜单name “%s” 已存在！".formatted(vo.getPermissionPrefix()));
             }
             String sql = "select max(id) from sys_menu";
-            Integer menuId = primaryJdbcTemplate.queryForObject(sql, Integer.class);
-            if (menuId == null) menuId = 0;
+            Long menuId = primaryJdbcTemplate.queryForObject(sql, Long.class);
+            if (menuId == null) menuId = 0L;
             menuId++;
             vo.setMenuId(menuId);
             genCodeResult.setFileName("createSysMenu.sql");

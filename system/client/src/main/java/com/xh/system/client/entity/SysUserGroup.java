@@ -14,7 +14,7 @@ import java.util.List;
 @Table
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SysUserGroup extends BaseEntity<Integer> {
+public class SysUserGroup extends BaseEntity<Long> {
 
     @Schema(title = "用户组名")
     private String name;

@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @Schema(title = "数据字典类型")
 @EqualsAndHashCode(callSuper = true)
-public class SysDictType extends BaseEntity<Integer> {
+public class SysDictType extends BaseEntity<Long> {
     @Schema(title = "字典类型名称")
     private String name;
     @Schema(title = "是否可修改")

@@ -15,7 +15,7 @@ import java.util.List;
 @Data
 public class SysUserJobDTO {
     @Schema(title = "用户id或者用户组的id", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Integer userId;
+    private Long userId;
     @Schema(title = "数据类型", allowableValues = {"1", "2"}, description = "1：用户，2：用户组", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer type;
     @Schema(title = "岗位信息")

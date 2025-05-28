@@ -61,7 +61,7 @@ public class SysFileController {
     @SaCheckPermission(value = {"system:file:edit", "system:file:detail"}, mode = SaMode.OR)
     @Operation(description = "获取文件详情")
     @GetMapping("/get/{id}")
-    public RestResponse<SysFile> getById(@PathVariable Integer id) {
+    public RestResponse<SysFile> getById(@PathVariable Long id) {
         return RestResponse.success(sysFileService.getById(id));
     }
 

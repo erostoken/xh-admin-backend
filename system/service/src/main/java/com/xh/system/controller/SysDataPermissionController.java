@@ -49,7 +49,7 @@ public class SysDataPermissionController {
     @SaCheckPermission(value = {"system:dataPermission:edit", "system:dataPermission:detail"}, mode = SaMode.OR)
     @Operation(description = "获取数据权限详情")
     @GetMapping("/get/{id}")
-    public RestResponse<SysDataPermission> getById(@PathVariable Integer id) {
+    public RestResponse<SysDataPermission> getById(@PathVariable Long id) {
         return RestResponse.success(sysDataPermissionService.getById(id));
     }
 

@@ -11,8 +11,8 @@ import lombok.Data;
 public class DataPermissionEntityDTO<I> extends BaseDTO<I> {
 
     @Schema(title = "机构ID")
-    protected Integer sysOrgId;
+    protected Long sysOrgId;
 
     @Schema(title = "角色ID")
-    protected Integer sysRoleId;
+    protected Long sysRoleId;
 }

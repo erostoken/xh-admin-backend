@@ -14,12 +14,12 @@ import java.util.List;
 @Table
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SysRole extends BaseEntity<Integer> {
+public class SysRole extends BaseEntity<Long> {
 
     @Schema(title = "角色名称")
     private String name;
     @Schema(title = "上级角色")
-    private Integer parentId;
+    private Long parentId;
     @Schema(title = "启用状态")
     private Boolean enabled;
     @Transient

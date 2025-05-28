@@ -149,11 +149,11 @@ public class GenTableVO {
     private String createTableSql;
 
     @Schema(title = "菜单id")
-    private Integer menuId;
+    private Long menuId;
 
     @Schema(title = "列")
     private List<GenTableColumnDTO> columns;
 
     @Schema(title = "当前登录用户ID")
-    private Integer userId;
+    private Long userId;
 }

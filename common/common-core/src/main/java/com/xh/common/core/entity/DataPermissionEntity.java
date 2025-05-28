@@ -18,9 +18,9 @@ public class DataPermissionEntity<I extends Serializable> extends BaseEntity<I> 
 
     @Schema(title = "机构ID")
     @AutoSet(AutoSetFun.CURRENT_ORG)
-    protected Integer sysOrgId;
+    protected Long sysOrgId;
 
     @Schema(title = "角色ID")
     @AutoSet(AutoSetFun.CURRENT_ROLE)
-    protected Integer sysRoleId;
+    protected Long sysRoleId;
 }

@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @Schema(title = "系统文件")
 @EqualsAndHashCode(callSuper = true)
-public class SysFile extends DataPermissionEntity<Integer> {
+public class SysFile extends DataPermissionEntity<Long> {
 
     @Schema(title = "对象存储key")
 
@@ -30,7 +30,7 @@ public class SysFile extends DataPermissionEntity<Integer> {
     private Long size;
     @Schema(title = "视频抽帧预览图，上传时会尝试抽第10帧图片作为视频文件的预览图")
 
-    private Integer previewImageFileId;
+    private Long previewImageFileId;
     @Schema(title = "图片宽度")
 
     private Integer imgWidth;

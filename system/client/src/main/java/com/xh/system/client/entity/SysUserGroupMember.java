@@ -12,12 +12,12 @@ import lombok.EqualsAndHashCode;
 @Table
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SysUserGroupMember extends BaseEntity<Integer> {
+public class SysUserGroupMember extends BaseEntity<Long> {
 
     @Schema(title = "系统用户组id")
-    private Integer sysUserGroupId;
+    private Long sysUserGroupId;
     @Schema(title = "系统用户id")
-    private Integer sysUserId;
+    private Long sysUserId;
 
     @Schema(title = "用户账号")
     @Transient

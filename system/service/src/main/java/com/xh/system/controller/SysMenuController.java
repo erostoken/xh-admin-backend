@@ -49,7 +49,7 @@ public class SysMenuController {
     @SaCheckPermission(value = {"system:menu:edit", "system:menu:detail"}, mode = SaMode.OR)
     @Operation(description = "获取菜单详情")
     @GetMapping("/get/{id}")
-    public RestResponse<SysMenu> getById(@PathVariable Integer id) {
+    public RestResponse<SysMenu> getById(@PathVariable Long id) {
         return RestResponse.success(sysMenuService.getById(id));
     }
 

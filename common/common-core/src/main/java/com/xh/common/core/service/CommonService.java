@@ -34,7 +34,7 @@ public class CommonService extends BaseServiceImpl {
     /**
      * 获取角色拥有的权限集合
      */
-    public List<SysMenuDTO> getRolePermissions(Integer roleId, Boolean refresh) {
+    public List<SysMenuDTO> getRolePermissions(Long roleId, Boolean refresh) {
         ValueOperations<String, Object> operations = redisTemplate.opsForValue();
 
         if (!refresh) {

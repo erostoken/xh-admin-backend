@@ -19,7 +19,7 @@ import java.util.List;
 @Data
 @Schema(title = "代码生成表")
 @EqualsAndHashCode(callSuper = true)
-public class GenTable extends BaseEntity<Integer> {
+public class GenTable extends BaseEntity<Long> {
 
     @Schema(title = "设计方式")
     private String designType;

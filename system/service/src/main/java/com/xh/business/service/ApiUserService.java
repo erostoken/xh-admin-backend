@@ -1,13 +1,18 @@
 package com.xh.business.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xh.business.domain.model.ApiUser;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.xh.business.domain.model.ApiUserPointRecord;
 import com.xh.business.domain.req.user.UserBindEmailRequest;
 import com.xh.business.domain.req.user.UserEmailLoginRequest;
 import com.xh.business.domain.req.user.UserEmailRegisterRequest;
+import com.xh.business.domain.req.user.UserPointsRequest;
+import com.xh.business.domain.req.user.UserQueryRequest;
 import com.xh.business.domain.req.user.UserRegisterRequest;
 import com.xh.business.domain.req.user.UserUnBindEmailRequest;
 import com.xh.business.domain.resp.user.UserVO;
+import com.xh.common.core.web.PageQuery;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -76,7 +81,7 @@ public interface ApiUserService extends IService<ApiUser> {
      * @return boolean
      */
     boolean userLogout(HttpServletRequest request);
-    
+
     /**
      * 校验
      *
@@ -99,8 +104,12 @@ public interface ApiUserService extends IService<ApiUser> {
      *
      * @param userId    用户id
      * @param addPoints 添加点
+     * @param channel   渠道
+     * @param remark    备注
      * @return boolean
      */
+    boolean addWalletBalance(Long userId, Long addPoints, String channel, String remark);
+    boolean addWalletBalance(Long userId, Long addPoints, String channel);
     boolean addWalletBalance(Long userId, Long addPoints);
 
     /**
@@ -108,8 +117,12 @@ public interface ApiUserService extends IService<ApiUser> {
      *
      * @param userId      用户id
      * @param reduceScore 减少分数
+     * @param channel   渠道
+     * @param remark    备注
      * @return boolean
      */
+    boolean reduceWalletBalance(Long userId, Long reduceScore, String channel, String remark);
+    boolean reduceWalletBalance(Long userId, Long reduceScore, String channel);
     boolean reduceWalletBalance(Long userId, Long reduceScore);
 
     /**
@@ -139,4 +152,19 @@ public interface ApiUserService extends IService<ApiUser> {
      */
     UserVO userUnBindEmail(UserUnBindEmailRequest userUnBindEmailRequest, HttpServletRequest request);
 
+    /**
+     * 更改积分
+     *
+     * @param userPointsRequest 用户积分请求
+     * @return boolean
+     */
+    boolean pointsChange(UserPointsRequest userPointsRequest);
+
+    /**
+     * 积分分页
+     *
+     * @param userQueryRequest 用户查询请求
+     * @return boolean
+     */
+    Page<ApiUserPointRecord> pointsPage(PageQuery<UserQueryRequest> userQueryRequest);
 }

@@ -12,14 +12,15 @@ import static com.xh.business.domain.constant.EmailConstant.CAPTCHA_CACHE_KEY;
 import static com.xh.business.domain.constant.EmailConstant.EMAIL_HTML_CONTENT_PATH;
 import static com.xh.business.domain.constant.EmailConstant.EMAIL_SUBJECT;
 import static com.xh.business.domain.constant.EmailConstant.EMAIL_TITLE;
-import static com.xh.business.domain.constant.UserConstant.ADMIN_ROLE;
 import com.xh.business.domain.enums.UserAccountStatusEnum;
 import com.xh.business.domain.model.ApiUser;
+import com.xh.business.domain.model.ApiUserPointRecord;
 import com.xh.business.domain.req.user.UserAddRequest;
 import com.xh.business.domain.req.user.UserBindEmailRequest;
 import com.xh.business.domain.req.user.UserEmailLoginRequest;
 import com.xh.business.domain.req.user.UserEmailRegisterRequest;
 import com.xh.business.domain.req.user.UserLoginRequest;
+import com.xh.business.domain.req.user.UserPointsRequest;
 import com.xh.business.domain.req.user.UserQueryRequest;
 import com.xh.business.domain.req.user.UserRegisterRequest;
 import com.xh.business.domain.req.user.UserUnBindEmailRequest;
@@ -278,6 +279,34 @@ public class UserController {
     }
 
     /**
+     * 积分变更
+     *
+     * @param userPointsRequest 用户添加请求
+     * @return {@link RestResponse}<{@link Boolean}>
+     */
+    @PostMapping("/points/change")
+    public RestResponse<Boolean> pointsChange(@RequestBody UserPointsRequest userPointsRequest) {
+        if (userPointsRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        return RestResponse.success(userService.pointsChange(userPointsRequest));
+    }
+
+    /**
+     * 用户积分分页
+     *
+     * @param userQueryRequest 用户积分请求
+     * @return {@link RestResponse}<{@link Page}<{@link ApiUserPointRecord}>>
+     */
+    @PostMapping("/points/page")
+    public RestResponse<Page<ApiUserPointRecord>> pointsPage(@RequestBody PageQuery<UserQueryRequest> userQueryRequest) {
+        if (ObjectUtils.anyNull(userQueryRequest, userQueryRequest.getParam(), userQueryRequest.getParam().getId())) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        return RestResponse.success(userService.pointsPage(userQueryRequest));
+    }
+
+    /**
      * 删除用户
      *
      * @param deleteRequest 删除请求
@@ -311,11 +340,11 @@ public class UserController {
         // 校验是否登录
         OnlineUserDTO onlineUserInfo = LoginUtil.getOnlineUserInfo();
         // 处理管理员业务,不是管理员抛异常
-        if (adminOperation && !onlineUserInfo.isAdmin()) {
+        if (adminOperation && Boolean.FALSE.equals(onlineUserInfo.isAdmin())) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
-
-        if (!onlineUserInfo.isAdmin() && !userUpdateRequest.getId().equals(onlineUserInfo.getUserId())) {
+        if (Boolean.FALSE.equals(onlineUserInfo.isAdmin())
+                && !userUpdateRequest.getId().equals(onlineUserInfo.getUserId())) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "只有本人或管理员可以修改");
         }
 
@@ -326,7 +355,6 @@ public class UserController {
 
         LambdaUpdateWrapper<ApiUser> userLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
         userLambdaUpdateWrapper.eq(ApiUser::getId, user.getId());
-
         boolean result = userService.update(user, userLambdaUpdateWrapper);
         if (!result) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "更新失败");

@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 public class SysRolePermissionDTO {
     @Schema(title = "权限ID")
-    private Integer sysRoleId;
+    private Long sysRoleId;
 
     @Schema(title = "角色数据权限")
     List<SysRoleDataPermission> permissions;

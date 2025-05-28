@@ -17,7 +17,7 @@ public class OnlineUserDTO implements Serializable {
     @Schema(title = "token")
     private String token;
     @Schema(title = "登录用户ID")
-    private Integer userId;
+    private Long userId;
     @Schema(title = "登录账户")
     private String userCode;
     @Schema(title = "登录账户名称")
@@ -41,9 +41,9 @@ public class OnlineUserDTO implements Serializable {
     @Schema(title = "当前语言名称")
     private String localeLabel;
     @Schema(title = "当前机构ID")
-    private Integer orgId;
+    private Long orgId;
     @Schema(title = "当前角色ID")
-    private Integer roleId;
+    private Long roleId;
     @Schema(title = "当前机构")
     private String orgName;
     @Schema(title = "当前使用角色名称")

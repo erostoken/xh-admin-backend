@@ -48,7 +48,7 @@ public class SysOrgController {
     @SaCheckPermission(value = {"system:org:edit", "system:org:detail"}, mode = SaMode.OR)
     @Operation(description = "获取机构详情")
     @GetMapping("/get/{id}")
-    public RestResponse<SysOrg> getById(@PathVariable Integer id) {
+    public RestResponse<SysOrg> getById(@PathVariable Long id) {
         return RestResponse.success(sysOrgService.getById(id));
     }
 
