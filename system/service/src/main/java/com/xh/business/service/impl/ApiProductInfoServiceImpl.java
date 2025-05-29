@@ -26,7 +26,7 @@ public class ApiProductInfoServiceImpl extends ServiceImpl<ApiProductInfoMapper,
         }
         String name = productInfo.getName();
         String description = productInfo.getDescription();
-        Long total = productInfo.getTotal();
+        Long total = productInfo.getAmount();
         Date expirationTime = productInfo.getExpirationTime();
         String productType = productInfo.getProductType();
         Long addPoints = productInfo.getAddPoints();

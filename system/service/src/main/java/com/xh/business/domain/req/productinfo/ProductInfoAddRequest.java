@@ -1,6 +1,8 @@
 package com.xh.business.domain.req.productinfo;
 
+import com.xh.common.core.configuration.jackson.MoneyFormat;
 import java.io.Serializable;
+import java.math.RoundingMode;
 import java.util.Date;
 import lombok.Data;
 
@@ -26,7 +28,8 @@ public class ProductInfoAddRequest implements Serializable {
     /**
      * 金额(分)
      */
-    private Long total;
+    @MoneyFormat
+    private Long amount;
 
     /**
      * 增加积分个数

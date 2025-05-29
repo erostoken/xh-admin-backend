@@ -3,6 +3,7 @@ package com.xh.business.domain.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.xh.common.core.configuration.jackson.MoneyFormat;
 import java.util.Date;
 import lombok.Data;
 
@@ -37,7 +38,8 @@ public class ApiProductInfo {
     /**
      * 金额(分)
      */
-    private Long total;
+    @MoneyFormat
+    private Long amount;
 
     /**
      * 增加积分个数

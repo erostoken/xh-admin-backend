@@ -1,6 +1,7 @@
 package com.xh.common.core.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
@@ -106,6 +107,9 @@ public class WebConfig implements WebMvcConfigurer {
                 .indentOutput(true)
                 .dateFormat(new SimpleDateFormat("yyyy-MM-dd"))
                 .simpleDateFormat(DATE_TIME_FORMAT)
+                // 全局将所有 Long 类型转为 String
+                .serializerByType(Long.class, ToStringSerializer.instance)
+                .serializerByType(Long.TYPE, ToStringSerializer.instance)
                 .serializers(new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)))
                 .serializers(new LocalDateSerializer(DateTimeFormatter.ofPattern(DATE_FORMAT)))
                 .deserializers(new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)))

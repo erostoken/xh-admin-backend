@@ -47,7 +47,7 @@ public class ProductOrderVO implements Serializable {
     /**
      * 金额(分)
      */
-    private String total;
+    private String amount;
     /**
      * 接口订单状态(SUCCESS：支付成功
      * REFUND：转入退款

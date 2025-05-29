@@ -11,9 +11,8 @@ import lombok.EqualsAndHashCode;
  * @Version: 1.0
  * @Description: 查询请求
  */
-@EqualsAndHashCode(callSuper = true)
 @Data
-public class ProductInfoQueryRequest extends PageQuery implements Serializable {
+public class ProductInfoQueryRequest implements Serializable {
 
     /**
      * 产品名称
@@ -23,20 +22,14 @@ public class ProductInfoQueryRequest extends PageQuery implements Serializable {
      * 增加积分个数
      */
     private Integer addPoints;
-
     /**
      * 产品描述
      */
     private String description;
 
     /**
-     * 金额(分)
+     * 商品状态（0- 默认下线 1- 上线）
      */
-    private Integer total;
-
-    /**
-     * 产品类型（VIP-会员 RECHARGE-充值）
-     */
-    private String productType;
+    private Integer status;
 
 }

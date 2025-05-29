@@ -1,6 +1,7 @@
 package com.xh.business.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xh.business.domain.constant.CommonConstant;
 import com.xh.business.domain.enums.ProductInfoStatusEnum;
@@ -14,13 +15,18 @@ import com.xh.business.service.ApiProductInfoService;
 import com.xh.business.service.ApiUserService;
 import com.xh.business.utils.BusinessException;
 import com.xh.business.utils.ErrorCode;
+import com.xh.common.core.dto.OnlineUserDTO;
+import com.xh.common.core.utils.LoginUtil;
 import com.xh.common.core.web.DeleteRequest;
 import com.xh.common.core.web.IdRequest;
+import com.xh.common.core.web.PageQuery;
 import com.xh.common.core.web.RestResponse;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -66,8 +72,8 @@ public class ProductInfoController {
         BeanUtils.copyProperties(productInfoAddRequest, productInfo);
         // 校验
         productInfoService.validProductInfo(productInfo, true);
-        UserVO loginUser = userService.getLoginUser(request);
-        productInfo.setUserId(loginUser.getId());
+        OnlineUserDTO onlineUserInfo = LoginUtil.getOnlineUserInfo();
+        productInfo.setUserId(onlineUserInfo.getUserId());
         boolean result = productInfoService.save(productInfo);
         if (!result) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR);
@@ -88,7 +94,7 @@ public class ProductInfoController {
         if (ObjectUtils.anyNull(deleteRequest, deleteRequest.getId()) || deleteRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        UserVO user = userService.getLoginUser(request);
+        OnlineUserDTO onlineUserInfo = LoginUtil.getOnlineUserInfo();
         long id = deleteRequest.getId();
         // 判断是否存在
         ApiProductInfo oldProductInfo = productInfoService.getById(id);
@@ -96,7 +102,7 @@ public class ProductInfoController {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
         // 仅本人或管理员可删除
-        if (!oldProductInfo.getUserId().equals(user.getId()) && !userService.isAdmin(request)) {
+        if (!oldProductInfo.getUserId().equals(onlineUserInfo.getUserId()) && Boolean.TRUE.equals(onlineUserInfo.isAdmin())) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
         boolean b = productInfoService.removeById(id);
@@ -122,7 +128,7 @@ public class ProductInfoController {
         BeanUtils.copyProperties(productInfoUpdateRequest, productInfo);
         // 参数校验
         productInfoService.validProductInfo(productInfo, false);
-        UserVO user = userService.getLoginUser(request);
+        OnlineUserDTO onlineUserInfo = LoginUtil.getOnlineUserInfo();
         long id = productInfoUpdateRequest.getId();
         // 判断是否存在
         ApiProductInfo oldProductInfo = productInfoService.getById(id);
@@ -130,7 +136,8 @@ public class ProductInfoController {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
         // 仅本人或管理员可修改
-        if (!userService.isAdmin(request) && !oldProductInfo.getUserId().equals(user.getId())) {
+        if (Boolean.FALSE.equals(onlineUserInfo.isAdmin())
+                && !oldProductInfo.getUserId().equals(onlineUserInfo.getUserId())) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
         boolean result = productInfoService.updateById(productInfo);
@@ -174,70 +181,62 @@ public class ProductInfoController {
     /**
      * 分页获取列表
      *
-     * @param productInfoQueryRequest 接口信息查询请求
+     * @param pageQuery 接口信息查询请求
      * @param request                 请求
      * @return {@link RestResponse}<{@link Page}<{@link ApiProductInfo}>>
      */
-    @GetMapping("/list/page")
-    public RestResponse<Page<ApiProductInfo>> listProductInfoByPage(ProductInfoQueryRequest productInfoQueryRequest, HttpServletRequest request) {
+    @PostMapping("/list/page")
+    public RestResponse<Page<ApiProductInfo>> listProductInfoByPage(@RequestBody PageQuery<ProductInfoQueryRequest> pageQuery, HttpServletRequest request) {
+        ProductInfoQueryRequest productInfoQueryRequest = pageQuery.getParam();
         if (productInfoQueryRequest == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+            productInfoQueryRequest = new ProductInfoQueryRequest();
+        }
+
+        long current = pageQuery.getCurrentPage();
+        long size = pageQuery.getPageSize();
+        // 根据金额升序排列
+        String sortField = pageQuery.getOrderProp();
+        String sortOrder = pageQuery.getOrderDirection().name();
+        if(Objects.isNull(pageQuery.getOrderProp())) {
+            sortField = "amount";
+            sortOrder = CommonConstant.SORT_ORDER_ASC;
         }
 
         ApiProductInfo productInfoQuery = new ApiProductInfo();
         BeanUtils.copyProperties(productInfoQueryRequest, productInfoQuery);
-        long size = productInfoQueryRequest.getPageSize();
-        String sortField = productInfoQueryRequest.getOrderProp();
-        String sortOrder = productInfoQueryRequest.getOrderDirection().name();
-
         String name = productInfoQueryRequest.getName();
-        long current = productInfoQueryRequest.getCurrentPage();
         String description = productInfoQueryRequest.getDescription();
-        String productType = productInfoQueryRequest.getProductType();
-        Integer addPoints = productInfoQueryRequest.getAddPoints();
-        Integer total = productInfoQueryRequest.getTotal();
-        // 限制爬虫
-        if (size > 50) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        QueryWrapper<ApiProductInfo> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like(StringUtils.isNotBlank(name), "name", name)
-                .like(StringUtils.isNotBlank(description), "description", description)
-                .eq(StringUtils.isNotBlank(productType), "productType", productType)
-                .eq(ObjectUtils.isNotEmpty(addPoints), "addPoints", addPoints)
-                .eq(ObjectUtils.isNotEmpty(total), "total", total);
-        // 根据金额升序排列
-        queryWrapper.orderByAsc("total");
-        Page<ApiProductInfo> productInfoPage = productInfoService.page(new Page<>(current, size), queryWrapper);
-        // 不是管理员只能查看已经上线的
-        if (!userService.isAdmin(request)) {
-            List<ApiProductInfo> productInfoList = productInfoPage.getRecords().stream()
-                    .filter(productInfo -> productInfo.getStatus().equals(ProductInfoStatusEnum.ONLINE.getValue())).collect(Collectors.toList());
-            productInfoPage.setRecords(productInfoList);
-        }
-        return RestResponse.success(productInfoPage);
+        Integer status = productInfoQueryRequest.getStatus();
+        QueryWrapper<ApiProductInfo> queryWrapper = Wrappers.<ApiProductInfo>query()
+                .orderBy(StringUtils.isNotBlank(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC), sortField);
+        queryWrapper.lambda()
+                .like(StringUtils.isNotBlank(name), ApiProductInfo::getName, name)
+                .eq(Objects.nonNull(status), ApiProductInfo::getStatus, status)
+                .like(StringUtils.isNotBlank(description), ApiProductInfo::getDescription, description);
+        return RestResponse.success(productInfoService.page(new Page<>(current, size), queryWrapper));
     }
 
     /**
      * 分页获取列表
      *
-     * @param productInfoQueryRequest 接口信息查询请求
+     * @param pageQuery 接口信息查询请求
      * @param request                 请求
      * @return {@link RestResponse}<{@link Page}<{@link ApiProductInfo}>>
      */
-    @GetMapping("/get/searchText")
-    public RestResponse<Page<ApiProductInfo>> listProductInfoBySearchTextPage(ProductInfoSearchTextRequest productInfoQueryRequest, HttpServletRequest request) {
+    @PostMapping("/get/searchText")
+    public RestResponse<Page<ApiProductInfo>> listProductInfoBySearchTextPage(@RequestBody PageQuery<ProductInfoSearchTextRequest> pageQuery, HttpServletRequest request) {
+        ProductInfoSearchTextRequest productInfoQueryRequest = pageQuery.getParam();
         if (productInfoQueryRequest == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+            productInfoQueryRequest = new ProductInfoSearchTextRequest();
         }
         ApiProductInfo productInfoQuery = new ApiProductInfo();
         BeanUtils.copyProperties(productInfoQueryRequest, productInfoQuery);
 
         String searchText = productInfoQueryRequest.getSearchText();
-        long size = productInfoQueryRequest.getPageSize();
-        long current = productInfoQueryRequest.getCurrentPage();
-        String sortField = productInfoQueryRequest.getOrderProp();
-        String sortOrder = productInfoQueryRequest.getOrderDirection().name();
+        long size = pageQuery.getPageSize();
+        long current = pageQuery.getCurrentPage();
+        String sortField = pageQuery.getOrderProp();
+        String sortOrder = pageQuery.getOrderDirection().name();
 
         QueryWrapper<ApiProductInfo> queryWrapper = new QueryWrapper<>();
         queryWrapper.like(StringUtils.isNotBlank(searchText), "name", searchText)
@@ -245,12 +244,6 @@ public class ProductInfoController {
                 .like(StringUtils.isNotBlank(searchText), "description", searchText);
         queryWrapper.orderBy(StringUtils.isNotBlank(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC), sortField);
         Page<ApiProductInfo> productInfoPage = productInfoService.page(new Page<>(current, size), queryWrapper);
-        // 不是管理员只能查看已经上线的
-        if (!userService.isAdmin(request)) {
-            List<ApiProductInfo> productInfoList = productInfoPage.getRecords().stream()
-                    .filter(productInfo -> productInfo.getStatus().equals(ProductInfoStatusEnum.ONLINE.getValue())).collect(Collectors.toList());
-            productInfoPage.setRecords(productInfoList);
-        }
         return RestResponse.success(productInfoPage);
     }
 

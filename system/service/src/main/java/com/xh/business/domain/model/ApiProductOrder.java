@@ -3,6 +3,7 @@ package com.xh.business.domain.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.xh.common.core.configuration.jackson.MoneyFormat;
 import java.util.Date;
 import lombok.Data;
 
@@ -47,7 +48,8 @@ public class ApiProductOrder {
     /**
      * 金额(分)
      */
-    private Long total;
+    @MoneyFormat
+    private Long amount;
 
     /**
      * 交易状态(SUCCESS：支付成功 REFUND：转入退款 NOTPAY：未支付 CLOSED：已关闭 REVOKED：已撤销（仅付款码支付会返回）

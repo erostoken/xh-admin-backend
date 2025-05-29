@@ -1,5 +1,6 @@
 package com.xh.business.domain.req.productinfo;
 
+import com.xh.common.core.configuration.jackson.MoneyFormat;
 import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
@@ -31,12 +32,13 @@ public class ProductInfoUpdateRequest implements Serializable {
     /**
      * 金额(分)
      */
-    private Integer total;
+    @MoneyFormat
+    private Long amount;
 
     /**
      * 增加积分个数
      */
-    private Integer addPoints;
+    private Long addPoints;
 
     /**
      * 产品类型（VIP-会员 RECHARGE-充值）

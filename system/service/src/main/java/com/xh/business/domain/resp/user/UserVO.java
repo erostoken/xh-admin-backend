@@ -1,5 +1,6 @@
 package com.xh.business.domain.resp.user;
 
+import com.xh.common.core.configuration.jackson.MoneyFormat;
 import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
@@ -39,6 +40,7 @@ public class UserVO implements Serializable {
     /**
      * 钱包余额（分）
      */
+    @MoneyFormat
     private Long balance;
 
     /**

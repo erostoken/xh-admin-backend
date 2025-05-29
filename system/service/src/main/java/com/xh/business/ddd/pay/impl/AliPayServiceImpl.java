@@ -14,7 +14,6 @@ import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.alipay.api.response.AlipayTradePagePayResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.binarywang.wxpay.bean.result.WxPayOrderQueryV3Result;
 import com.ijpay.alipay.AliPayApi;
 import com.ijpay.alipay.AliPayApiConfigKit;
@@ -29,7 +28,6 @@ import com.xh.business.domain.dto.pay.PaymentInfoDTO;
 import com.xh.business.domain.enums.AlipayTradeStatusEnum;
 import static com.xh.business.domain.enums.ImageStatusEnum.SUCCESS;
 import static com.xh.business.domain.enums.PayTypeStatusEnum.ALIPAY;
-import com.xh.business.domain.enums.PaymentStatusEnum;
 import static com.xh.business.domain.enums.PaymentStatusEnum.CLOSED;
 import static com.xh.business.domain.enums.PaymentStatusEnum.NOTPAY;
 import com.xh.business.domain.model.ApiProductInfo;
@@ -109,7 +107,7 @@ public class AliPayServiceImpl implements PayService {
         ProductOrderVO ProductOrderVO = new ProductOrderVO();
         BeanUtils.copyProperties(oldOrder, ProductOrderVO);
         ProductOrderVO.setProductInfo(JSONUtil.toBean(oldOrder.getProductInfo(), ApiProductInfo.class));
-        ProductOrderVO.setTotal(oldOrder.getTotal().toString());
+        ProductOrderVO.setAmount(oldOrder.getAmount().toString());
         return ProductOrderVO;
     }
 
@@ -129,7 +127,7 @@ public class AliPayServiceImpl implements PayService {
         productOrder.setOrderNo(orderNo);
         productOrder.setProductId(productInfo.getId());
         productOrder.setOrderName(productInfo.getName());
-        productOrder.setTotal(productInfo.getTotal());
+        productOrder.setAmount(productInfo.getAmount());
         productOrder.setStatus(NOTPAY.getValue());
         productOrder.setPayType(ALIPAY.getValue());
         productOrder.setExpirationTime(expirationTime);
@@ -143,7 +141,7 @@ public class AliPayServiceImpl implements PayService {
         model.setSubject(productInfo.getName());
         model.setProductCode("FAST_INSTANT_TRADE_PAY");
         // 金额四舍五入
-        BigDecimal scaledAmount = new BigDecimal(productInfo.getTotal()).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+        BigDecimal scaledAmount = new BigDecimal(productInfo.getAmount()).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
         model.setTotalAmount(String.valueOf(scaledAmount));
         model.setBody(productInfo.getDescription());
 
@@ -168,7 +166,7 @@ public class AliPayServiceImpl implements PayService {
         ProductOrderVO ProductOrderVO = new ProductOrderVO();
         BeanUtils.copyProperties(productOrder, ProductOrderVO);
         ProductOrderVO.setProductInfo(productInfo);
-        ProductOrderVO.setTotal(productInfo.getTotal().toString());
+        ProductOrderVO.setAmount(productInfo.getAmount().toString());
         return ProductOrderVO;
     }
 
@@ -319,7 +317,7 @@ public class AliPayServiceImpl implements PayService {
         }
         // 2.判断 total_amount 是否确实为该订单的实际金额（即商家订单创建时的金额）。
         int totalAmount = new BigDecimal(response.getTotalAmount()).multiply(new BigDecimal("100")).intValue();
-        if (totalAmount != productOrder.getTotal()) {
+        if (totalAmount != productOrder.getAmount()) {
             log.error("订单金额不一致");
             return result;
         }

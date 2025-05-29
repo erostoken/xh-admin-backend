@@ -12,8 +12,7 @@ import lombok.EqualsAndHashCode;
  * @Description: 产品信息搜索文本请求
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class ProductInfoSearchTextRequest extends PageQuery implements Serializable {
+public class ProductInfoSearchTextRequest implements Serializable {
 
     /**
      * 搜索文本

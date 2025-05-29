@@ -4,13 +4,11 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xh.business.ddd.order.OrderService;
-import com.xh.business.ddd.pay.PayService;
 import static com.xh.business.domain.constant.PayConstant.QUERY_ORDER_STATUS;
 import static com.xh.business.domain.enums.ImageStatusEnum.SUCCESS;
 import com.xh.business.domain.enums.PaymentStatusEnum;
 import com.xh.business.domain.model.ApiProductInfo;
 import com.xh.business.domain.model.ApiProductOrder;
-import com.xh.business.domain.req.productorder.ProductOrderAddRequest;
 import com.xh.business.domain.req.productorder.ProductOrderCreateRequest;
 import com.xh.business.domain.req.productorder.ProductOrderQueryRequest;
 import com.xh.business.domain.resp.order.OrderVO;
@@ -239,9 +237,9 @@ public class OrderController {
         ApiProductInfo prodInfo = JSONUtil.toBean(productOrder.getProductInfo(), ApiProductInfo.class);
         ProductOrderVO.setDescription(prodInfo.getDescription());
         ProductOrderVO.setProductType(prodInfo.getProductType());
-        String voTotal = String.valueOf(prodInfo.getTotal());
+        String voTotal = String.valueOf(prodInfo.getAmount());
         BigDecimal total = new BigDecimal(voTotal).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
-        ProductOrderVO.setTotal(total.toString());
+        ProductOrderVO.setAmount(total.toString());
         return ProductOrderVO;
     }
 }
