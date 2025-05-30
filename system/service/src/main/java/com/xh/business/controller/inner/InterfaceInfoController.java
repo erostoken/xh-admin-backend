@@ -1,4 +1,4 @@
-package com.xh.business.controller;
+package com.xh.business.controller.inner;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;

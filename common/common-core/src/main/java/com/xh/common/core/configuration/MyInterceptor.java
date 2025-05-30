@@ -1,10 +1,12 @@
 package com.xh.common.core.configuration;
 
 import cn.dev33.satoken.config.SaTokenConfig;
+import cn.dev33.satoken.fun.SaParamFunction;
 import cn.dev33.satoken.interceptor.SaInterceptor;
 import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpUtil;
 import com.xh.common.core.Constant;
+import com.xh.common.core.dto.ExUserInfoDTO;
 import com.xh.common.core.dto.SysLoginUserInfoDTO;
 import com.xh.common.core.dto.SysUserDTO;
 import com.xh.common.core.entity.SysLog;
@@ -18,6 +20,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.HandlerMethod;
@@ -71,41 +74,64 @@ public class MyInterceptor extends SaInterceptor {
             //打印一下控制器相关日志
             log.info("{} {} {}--{}", controllerClass.getName(), method.getName(), tag.name(), operation.description());
 
-            this.auth = ignored -> {
-                // SaToken鉴权
-                StpUtil.checkLogin();
-                SysLoginUserInfoDTO userInfoDTO = LoginUtil.getSysUserInfo();
-                SysUserDTO user = userInfoDTO.getUser();
-
-                // 演示站的演示账号部分操作不允许
-                if(Boolean.TRUE.equals(user.getIsDemo())) {
-                    boolean hit = SaRouter.notMatch(
-                                    "/api/system/user/personalCenterSave",
-                                    "/api/file/operation/upload",
-                                    "/api/system/user/imports",
-                                    "/api/system/user/resetPassword",
-                                    "/api/system/user/saveUserJobs",
-                                    "/api/system/user/saveUserGroup",
-                                    "/api/system/user/delUserGroup"
-                            )
-                            .notMatch(obj -> {
-                                boolean isDel = requestURI.endsWith("/del");
-                                boolean isSave = requestURI.endsWith("/save");
-                                boolean isSwitchProp = requestURI.endsWith("/switch_prop");
-                                return isDel || isSave || isSwitchProp;
-                            }).isHit();
-                    // 代码生成器不拦截
-                    boolean hitGenCode = SaRouter.match("/api/generator/**").isHit();
-                    if(!hit && !hitGenCode) throw new MyException("演示账号不允许此操作");
-                }
-
-                if (Boolean.TRUE.equals(user.getAutoRenewal())) {
-                    //续签token过期时间
-                    StpUtil.renewTimeout(saTokenConfig.getTimeout());
-                }
-            };
+            if (Objects.nonNull(controllerClass.getAnnotation(ExUser.class)) || Objects.nonNull(method.getAnnotation(ExUser.class))) {
+                // 外部用户
+                this.auth = this.exAuth(requestURI);
+            } else {
+                // 内部用户
+                this.auth = this.innerAuth(requestURI);
+            }
             return super.preHandle(request, response, handler);
         }
         return true;
+    }
+
+    private SaParamFunction<Object> exAuth(String requestURI) {
+        return ignored -> {
+            // SaToken鉴权
+            StpUtil.checkLogin();
+            ExUserInfoDTO exUserInfo = LoginUtil.getExUserInfo();
+
+            if (Boolean.TRUE.equals(exUserInfo.getAutoRenewal())) {
+                //续签token过期时间
+                StpUtil.renewTimeout(saTokenConfig.getTimeout());
+            }
+        };
+    }
+
+    private SaParamFunction<Object> innerAuth(String requestURI) {
+        return ignored -> {
+            // SaToken鉴权
+            StpUtil.checkLogin();
+            SysLoginUserInfoDTO userInfoDTO = LoginUtil.getSysUserInfo();
+            SysUserDTO user = userInfoDTO.getUser();
+
+            // 演示站的演示账号部分操作不允许
+            if (Boolean.TRUE.equals(user.getIsDemo())) {
+                boolean hit = SaRouter.notMatch(
+                                "/api/system/user/personalCenterSave",
+                                "/api/file/operation/upload",
+                                "/api/system/user/imports",
+                                "/api/system/user/resetPassword",
+                                "/api/system/user/saveUserJobs",
+                                "/api/system/user/saveUserGroup",
+                                "/api/system/user/delUserGroup"
+                        )
+                        .notMatch(obj -> {
+                            boolean isDel = requestURI.endsWith("/del");
+                            boolean isSave = requestURI.endsWith("/save");
+                            boolean isSwitchProp = requestURI.endsWith("/switch_prop");
+                            return isDel || isSave || isSwitchProp;
+                        }).isHit();
+                // 代码生成器不拦截
+                boolean hitGenCode = SaRouter.match("/api/generator/**").isHit();
+                if (!hit && !hitGenCode) throw new MyException("演示账号不允许此操作");
+            }
+
+            if (Boolean.TRUE.equals(user.getAutoRenewal())) {
+                //续签token过期时间
+                StpUtil.renewTimeout(saTokenConfig.getTimeout());
+            }
+        };
     }
 }

@@ -1,4 +1,4 @@
-package com.xh.business.controller;
+package com.xh.business.controller.inner;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -10,7 +10,6 @@ import com.xh.business.domain.req.productinfo.ProductInfoAddRequest;
 import com.xh.business.domain.req.productinfo.ProductInfoQueryRequest;
 import com.xh.business.domain.req.productinfo.ProductInfoSearchTextRequest;
 import com.xh.business.domain.req.productinfo.ProductInfoUpdateRequest;
-import com.xh.business.domain.resp.user.UserVO;
 import com.xh.business.service.ApiProductInfoService;
 import com.xh.business.service.ApiUserService;
 import com.xh.business.utils.BusinessException;
@@ -25,8 +24,6 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;

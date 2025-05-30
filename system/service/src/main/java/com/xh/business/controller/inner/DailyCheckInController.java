@@ -1,4 +1,4 @@
-package com.xh.business.controller;
+package com.xh.business.controller.inner;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.xh.business.domain.constant.PointsConstant;

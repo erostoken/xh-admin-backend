@@ -2,6 +2,7 @@ package com.xh.common.core.utils;
 
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.xh.common.core.dto.ExUserInfoDTO;
 import com.xh.common.core.dto.OnlineUserDTO;
 import com.xh.common.core.dto.SysLoginUserInfoDTO;
 import com.xh.common.core.dto.WxUserInfoDTO;
@@ -11,6 +12,7 @@ import com.xh.common.core.dto.WxUserInfoDTO;
  */
 public class LoginUtil {
     public final static String SYS_USER_KEY = "sysUserInfo";
+    public final static String EX_USER_KEY = "exUserInfo";
     public final static String WX_USER_KEY = "wxUserInfo";
 
     /**
@@ -25,6 +27,13 @@ public class LoginUtil {
      */
     public static OnlineUserDTO getOnlineUserInfo() {
         return StpUtil.getTokenSession().getModel(SYS_USER_KEY, OnlineUserDTO.class);
+    }
+
+    /**
+     * 获取外部登录用户详情
+     */
+    public static ExUserInfoDTO getExUserInfo() {
+        return StpUtil.getTokenSession().getModel(EX_USER_KEY, ExUserInfoDTO.class);
     }
 
     /**

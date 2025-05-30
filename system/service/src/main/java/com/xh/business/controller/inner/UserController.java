@@ -1,4 +1,4 @@
-package com.xh.business.controller;
+package com.xh.business.controller.inner;
 
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -30,6 +30,7 @@ import com.xh.business.service.ApiUserService;
 import com.xh.business.utils.BusinessException;
 import com.xh.business.utils.EmailUtil;
 import com.xh.business.utils.ErrorCode;
+import com.xh.common.core.dto.ExUserInfoDTO;
 import com.xh.common.core.dto.OnlineUserDTO;
 import com.xh.common.core.utils.LoginUtil;
 import com.xh.common.core.web.DeleteRequest;
@@ -92,27 +93,6 @@ public class UserController {
         }
         long result = userService.userRegister(userRegisterRequest);
         return RestResponse.success(result);
-    }
-
-    /**
-     * 用户登录
-     *
-     * @param userLoginRequest 用户登录请求
-     * @param request          请求
-     * @return {@link RestResponse}<{@link ApiUser}>
-     */
-    @PostMapping("/login")
-    public RestResponse<UserVO> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
-        if (userLoginRequest == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        String userAccount = userLoginRequest.getUserAccount();
-        String userPassword = userLoginRequest.getUserPassword();
-        if (StringUtils.isAnyBlank(userAccount, userPassword)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        UserVO user = userService.userLogin(userAccount, userPassword, request);
-        return RestResponse.success(user);
     }
 
     /**
@@ -216,21 +196,6 @@ public class UserController {
         helper.setTo(emailAccount);
         helper.setFrom(EMAIL_TITLE + '<' + emailConfig.getEmailFrom() + '>');
         mailSender.send(message);
-    }
-
-    /**
-     * 用户注销
-     *
-     * @param request 请求
-     * @return {@link RestResponse}<{@link Boolean}>
-     */
-    @PostMapping("/logout")
-    public RestResponse<Boolean> userLogout(HttpServletRequest request) {
-        if (request == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        boolean result = userService.userLogout(request);
-        return RestResponse.success(result);
     }
 
     /**

@@ -102,6 +102,7 @@ public class MyFilter extends HttpFilter {
                         "/api/system/log/get/**",
                         "/api/system/user/queryOnlineUser",
                         "/api/file/operation/download",
+                        "/api/ex/**",
                         "/api/system/user/queryUserGroupList"
                 )
                 .notMatchMethod("OPTIONS")

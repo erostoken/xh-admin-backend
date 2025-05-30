@@ -1,9 +1,11 @@
 package com.xh.business.domain.resp.user;
 
 import com.xh.common.core.configuration.jackson.MoneyFormat;
+import com.xh.common.core.dto.ExUserInfoDTO;
 import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @Author: QiMu
@@ -12,7 +14,8 @@ import lombok.Data;
  * @Description: 用户视图
  */
 @Data
-public class UserVO implements Serializable {
+@EqualsAndHashCode(callSuper = true)
+public class UserVO extends ExUserInfoDTO implements Serializable {
     private static final long serialVersionUID = 1L;
     /**
      * id

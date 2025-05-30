@@ -1,4 +1,4 @@
-package com.xh.business.controller;
+package com.xh.business.controller.inner;
 
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;

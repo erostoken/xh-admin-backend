@@ -13,6 +13,7 @@ import com.xh.business.domain.req.user.UserRegisterRequest;
 import com.xh.business.domain.req.user.UserUnBindEmailRequest;
 import com.xh.business.domain.resp.user.UserVO;
 import com.xh.common.core.web.PageQuery;
+import com.xh.system.client.dto.ImageCaptchaDTO;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -39,16 +40,6 @@ public interface ApiUserService extends IService<ApiUser> {
     long userEmailRegister(UserEmailRegisterRequest userEmailRegisterRequest);
 
     /**
-     * 用户登录
-     *
-     * @param userAccount  用户账户
-     * @param userPassword 用户密码
-     * @param request      请求
-     * @return 脱敏后的用户信息
-     */
-    UserVO userLogin(String userAccount, String userPassword, HttpServletRequest request);
-
-    /**
      * 获取登录用户
      * 获取当前登录用户
      *
@@ -73,14 +64,6 @@ public interface ApiUserService extends IService<ApiUser> {
      * @return {@link User}
      */
     ApiUser isTourist(HttpServletRequest request);
-
-    /**
-     * 用户注销
-     *
-     * @param request 请求
-     * @return boolean
-     */
-    boolean userLogout(HttpServletRequest request);
 
     /**
      * 校验

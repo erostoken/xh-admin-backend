@@ -1,5 +1,9 @@
 package com.xh.business.service.impl;
 
+import cn.dev33.satoken.session.SaSession;
+import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.captcha.AbstractCaptcha;
+import cn.hutool.captcha.CaptchaUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -27,18 +31,26 @@ import com.xh.business.service.ApiUserService;
 import com.xh.business.utils.BusinessException;
 import com.xh.business.utils.ErrorCode;
 import com.xh.business.utils.RedissonLockUtil;
+import com.xh.common.core.Constant;
+import com.xh.common.core.dto.ExUserInfoDTO;
+import com.xh.common.core.dto.SysLoginUserInfoDTO;
+import com.xh.common.core.dto.SysUserDTO;
+import com.xh.common.core.utils.LoginUtil;
 import com.xh.common.core.web.PageQuery;
+import com.xh.system.client.dto.ImageCaptchaDTO;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
@@ -56,7 +68,7 @@ public class ApiUserServiceImpl extends ServiceImpl<ApiUserMapper, ApiUser>
     implements ApiUserService {
     
     @Resource
-    private RedisTemplate<String, String> redisTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
     @Resource
     private RedissonLockUtil redissonLockUtil;
     @Resource
@@ -73,7 +85,8 @@ public class ApiUserServiceImpl extends ServiceImpl<ApiUserMapper, ApiUser>
     public long userRegister(UserRegisterRequest userRegisterRequest) {
         String userAccount = userRegisterRequest.getUserAccount();
         String userPassword = userRegisterRequest.getUserPassword();
-        String userName = userRegisterRequest.getUserName();
+        String userName = StringUtils.isBlank(userRegisterRequest.getUserName()) ?
+                String.format("注册用户%s", userAccount) : userRegisterRequest.getUserName();
         String checkPassword = userRegisterRequest.getCheckPassword();
         String invitationCode = userRegisterRequest.getInvitationCode();
 
@@ -169,7 +182,7 @@ public class ApiUserServiceImpl extends ServiceImpl<ApiUserMapper, ApiUser>
         if (!Pattern.matches(emailPattern, emailAccount)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "不合法的邮箱地址！");
         }
-        String cacheCaptcha = redisTemplate.opsForValue().get(CAPTCHA_CACHE_KEY + emailAccount);
+        String cacheCaptcha = (String) redisTemplate.opsForValue().get(CAPTCHA_CACHE_KEY + emailAccount);
         if (StringUtils.isBlank(cacheCaptcha)) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "验证码已过期,请重新获取");
         }
@@ -220,55 +233,6 @@ public class ApiUserServiceImpl extends ServiceImpl<ApiUserMapper, ApiUser>
         }, "邮箱账号注册失败");
     }
 
-
-    /**
-     * 用户登录
-     *
-     * @param userAccount  用户帐户
-     * @param userPassword 用户密码
-     * @param request      要求
-     * @return {@link UserVO}
-     */
-    @Override
-    public UserVO userLogin(String userAccount, String userPassword, HttpServletRequest request) {
-        // 1. 校验
-        if (StringUtils.isAnyBlank(userAccount, userPassword)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
-        }
-        if (userAccount.length() < 4) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户账号过短,不能小于4位");
-        }
-        if (userPassword.length() < 8) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户密码过短,不能低于8位字符");
-        }
-        //  5. 账户不包含特殊字符
-        // 匹配由数字、小写字母、大写字母组成的字符串,且字符串的长度至少为1个字符
-        String pattern = "[0-9a-zA-Z]+";
-        if (!userAccount.matches(pattern)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号需由数字、小写字母、大写字母组成");
-        }
-        // 2. 加密
-        String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
-        // 查询用户是否存在
-        ApiUser user = this.lambdaQuery()
-                .eq(ApiUser::getUserAccount, userAccount)
-                .eq(ApiUser::getUserPassword, encryptPassword)
-                .one();
-        // 用户不存在
-        if (user == null) {
-            log.info("user login failed, userAccount cannot match userPassword");
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在或密码错误");
-        }
-        if (user.getStatus().equals(UserAccountStatusEnum.BAN.getValue())) {
-            throw new BusinessException(ErrorCode.PROHIBITED, "账号已封禁");
-        }
-        UserVO userVO = new UserVO();
-        BeanUtils.copyProperties(user, userVO);
-        // 3. 记录用户的登录态
-        request.getSession().setAttribute(USER_LOGIN_STATE, userVO);
-        return userVO;
-    }
-
     /**
      * 用户电子邮件登录
      *
@@ -288,7 +252,7 @@ public class ApiUserServiceImpl extends ServiceImpl<ApiUserMapper, ApiUser>
         if (!Pattern.matches(emailPattern, emailAccount)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "不合法的邮箱地址！");
         }
-        String cacheCaptcha = redisTemplate.opsForValue().get(CAPTCHA_CACHE_KEY + emailAccount);
+        String cacheCaptcha = (String) redisTemplate.opsForValue().get(CAPTCHA_CACHE_KEY + emailAccount);
         if (StringUtils.isBlank(cacheCaptcha)) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "验证码已过期,请重新获取");
         }
@@ -327,7 +291,7 @@ public class ApiUserServiceImpl extends ServiceImpl<ApiUserMapper, ApiUser>
         if (!Pattern.matches(emailPattern, emailAccount)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "不合法的邮箱地址！");
         }
-        String cacheCaptcha = redisTemplate.opsForValue().get(CAPTCHA_CACHE_KEY + emailAccount);
+        String cacheCaptcha = (String) redisTemplate.opsForValue().get(CAPTCHA_CACHE_KEY + emailAccount);
         if (StringUtils.isBlank(cacheCaptcha)) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "验证码已过期,请重新获取");
         }
@@ -369,7 +333,7 @@ public class ApiUserServiceImpl extends ServiceImpl<ApiUserMapper, ApiUser>
         if (!Pattern.matches(emailPattern, emailAccount)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "不合法的邮箱地址！");
         }
-        String cacheCaptcha = redisTemplate.opsForValue().get(CAPTCHA_CACHE_KEY + emailAccount);
+        String cacheCaptcha = (String) redisTemplate.opsForValue().get(CAPTCHA_CACHE_KEY + emailAccount);
         if (StringUtils.isBlank(cacheCaptcha)) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "验证码已过期,请重新获取");
         }
@@ -453,22 +417,6 @@ public class ApiUserServiceImpl extends ServiceImpl<ApiUserMapper, ApiUser>
         // 从数据库查询（追求性能的话可以注释，直接走缓存）
         long userId = currentUser.getId();
         return this.getById(userId);
-    }
-
-    /**
-     * 用户注销
-     *
-     * @param request 要求
-     * @return boolean
-     */
-    @Override
-    public boolean userLogout(HttpServletRequest request) {
-        if (request.getSession().getAttribute(USER_LOGIN_STATE) == null) {
-            throw new BusinessException(ErrorCode.OPERATION_ERROR, "未登录");
-        }
-        // 移除登录态
-        request.getSession().removeAttribute(USER_LOGIN_STATE);
-        return true;
     }
 
     @Override
