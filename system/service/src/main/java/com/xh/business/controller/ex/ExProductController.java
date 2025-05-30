@@ -7,7 +7,12 @@ import com.xh.business.domain.constant.CommonConstant;
 import com.xh.business.domain.enums.ProductInfoStatusEnum;
 import com.xh.business.domain.model.ApiProductInfo;
 import com.xh.business.domain.req.productinfo.ProductInfoQueryRequest;
+import com.xh.business.domain.req.productorder.ProductOrderCreateRequest;
+import com.xh.business.domain.resp.order.ProductOrderVO;
+import com.xh.business.domain.resp.user.UserVO;
 import com.xh.business.service.ApiProductInfoService;
+import com.xh.business.utils.BusinessException;
+import com.xh.business.utils.ErrorCode;
 import com.xh.common.core.configuration.ExUser;
 import com.xh.common.core.web.PageQuery;
 import com.xh.common.core.web.RestResponse;
@@ -17,6 +22,7 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2025/5/30
  * @description 备注信息
  */
+@ExUser
 @RestController
 @RequestMapping("/api/ex/product")
 @Slf4j
@@ -45,7 +52,6 @@ public class ExProductController {
      * @param pageQuery 接口信息查询请求
      * @return {@link RestResponse}<{@link Page}<{@link ApiProductInfo}>>
      */
-    @ExUser
     @Operation(description = "分页获取列表")
     @PostMapping("/list/page")
     public RestResponse<Page<ApiProductInfo>> listProductInfoByPage(@RequestBody PageQuery<ProductInfoQueryRequest> pageQuery) {

@@ -13,6 +13,7 @@ import com.xh.business.domain.req.user.UserRegisterRequest;
 import com.xh.business.domain.req.user.UserUnBindEmailRequest;
 import com.xh.business.domain.resp.user.UserVO;
 import com.xh.common.core.web.PageQuery;
+import com.xh.common.core.web.RestResponse;
 import com.xh.system.client.dto.ImageCaptchaDTO;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -150,4 +151,11 @@ public interface ApiUserService extends IService<ApiUser> {
      * @return boolean
      */
     Page<ApiUserPointRecord> pointsPage(PageQuery<UserQueryRequest> userQueryRequest);
+
+    /**
+     * 获取当前登陆用户
+     *
+     * @return {@link RestResponse}<{@link UserVO}>
+     */
+    UserVO getUser();
 }

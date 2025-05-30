@@ -2,6 +2,7 @@ package com.xh.business.service;
 
 import com.xh.business.domain.model.ApiProductInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.xh.business.domain.resp.order.ProductOrderVO;
 
 /**
 * @author apple
@@ -19,4 +20,12 @@ public interface ApiProductInfoService extends IService<ApiProductInfo> {
      */
     void validProductInfo(ApiProductInfo productInfo, boolean add);
 
+    /**
+     * 创建订单
+     *
+     * @param productId 产品id
+     * @param payType   支付方式
+     * @return 订单信息
+     */
+    ProductOrderVO createOrderByPayType(Long productId, String payType);
 }

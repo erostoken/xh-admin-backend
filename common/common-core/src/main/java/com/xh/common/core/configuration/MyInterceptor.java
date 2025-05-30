@@ -58,28 +58,30 @@ public class MyInterceptor extends SaInterceptor {
             final var requestURI = request.getRequestURI();
             SysLog sysLog = MyContext.getSysLog();
             Class<?> controllerClass = handlerMethod.getBeanType();
-            Tag tag = controllerClass.getAnnotation(Tag.class);
-            Method method = handlerMethod.getMethod();
-            Operation operation = method.getAnnotation(Operation.class);
-            if (tag == null || CommonUtil.isEmpty(tag.name())) {
-                throw new MyException("保持良好的开发规范，请补充：%s 类Tag注解name属性，描述controller用途".formatted(controllerClass.getName()));
-            }
-            if (operation == null || CommonUtil.isEmpty(operation.description())) {
-                throw new MyException("保持良好的开发规范，请补充：%s 方法Operation注解description属性描述方法用途".formatted(method.getName()));
-            }
+            if(controllerClass.getPackageName().startsWith("com.xh")) {
+                Tag tag = controllerClass.getAnnotation(Tag.class);
+                Method method = handlerMethod.getMethod();
+                Operation operation = method.getAnnotation(Operation.class);
+                if (tag == null || CommonUtil.isEmpty(tag.name())) {
+                    throw new MyException("保持良好的开发规范，请补充：%s 类Tag注解name属性，描述controller用途".formatted(controllerClass.getName()));
+                }
+                if (operation == null || CommonUtil.isEmpty(operation.description())) {
+                    throw new MyException("保持良好的开发规范，请补充：%s 方法Operation注解description属性描述方法用途".formatted(method.getName()));
+                }
 
-            sysLog.setTag(tag.name());
-            sysLog.setOperation(operation.description());
+                sysLog.setTag(tag.name());
+                sysLog.setOperation(operation.description());
 
-            //打印一下控制器相关日志
-            log.info("{} {} {}--{}", controllerClass.getName(), method.getName(), tag.name(), operation.description());
+                //打印一下控制器相关日志
+                log.info("{} {} {}--{}", controllerClass.getName(), method.getName(), tag.name(), operation.description());
 
-            if (Objects.nonNull(controllerClass.getAnnotation(ExUser.class)) || Objects.nonNull(method.getAnnotation(ExUser.class))) {
-                // 外部用户
-                this.auth = this.exAuth(requestURI);
-            } else {
-                // 内部用户
-                this.auth = this.innerAuth(requestURI);
+                if (Objects.nonNull(controllerClass.getAnnotation(ExUser.class)) || Objects.nonNull(method.getAnnotation(ExUser.class))) {
+                    // 外部用户
+                    this.auth = this.exAuth(requestURI);
+                } else {
+                    // 内部用户
+                    this.auth = this.innerAuth(requestURI);
+                }
             }
             return super.preHandle(request, response, handler);
         }

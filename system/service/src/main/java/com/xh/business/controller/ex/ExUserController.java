@@ -6,10 +6,9 @@ import com.xh.business.domain.model.ApiUser;
 import com.xh.business.domain.req.user.UserLoginRequest;
 import com.xh.business.domain.req.user.UserRegisterRequest;
 import com.xh.business.domain.resp.user.UserVO;
-import com.xh.business.service.ApiUserService;
 import com.xh.business.utils.BusinessException;
 import com.xh.business.utils.ErrorCode;
-import com.xh.common.core.dto.ExUserInfoDTO;
+import com.xh.common.core.configuration.ExUser;
 import com.xh.common.core.web.RestResponse;
 import com.xh.system.client.dto.ImageCaptchaDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,7 +16,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2025/5/29
  * @description 外部用户
  */
+@ExUser
 @RestController
 @RequestMapping("/api/ex/user")
 @Slf4j
@@ -86,6 +85,18 @@ public class ExUserController {
         String userAccount = userLoginRequest.getUserAccount();
         String userPassword = userLoginRequest.getUserPassword();
         return RestResponse.success(exApiUserAggregate.userLogin(userAccount, userPassword, request));
+    }
+
+    /**
+     * 获取用户
+     *
+     * @return {@link RestResponse}<{@link UserVO}>
+     */
+    @SaIgnore
+    @Operation(description = "获取用户")
+    @GetMapping("/get")
+    public RestResponse<UserVO> getUser() {
+        return RestResponse.success(exApiUserAggregate.getLoginUser());
     }
 
     /**

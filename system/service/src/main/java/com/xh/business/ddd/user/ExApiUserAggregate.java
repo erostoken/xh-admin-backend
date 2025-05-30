@@ -19,7 +19,6 @@ import com.xh.common.core.web.RestResponse;
 import com.xh.system.client.dto.ImageCaptchaDTO;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -73,42 +72,6 @@ public class ExApiUserAggregate {
     }
 
     /**
-     * 刷新用户登录信息
-     *
-     * @return 脱敏后的用户信息
-     */
-    private UserVO refreshUserLogin() {
-        if(!StpUtil.isLogin()) {
-            return null;
-        }
-
-        // 获取satoken用户信息
-        ExUserInfoDTO userInfoDTO = StpUtil.getTokenSession().getModel(LoginUtil.EX_USER_KEY, ExUserInfoDTO.class);
-        if (Objects.isNull(userInfoDTO) || StringUtils.isBlank(userInfoDTO.getUserKey())) {
-            StpUtil.getTokenSession().delete(LoginUtil.EX_USER_KEY);
-            return null;
-        }
-
-        // 获取用户
-        ApiUser user = apiUserService.lambdaQuery()
-                .eq(ApiUser::getUserAccount, userInfoDTO.getUserKey())
-                .one();
-        // 用户不存在
-        if (user == null) {
-            log.info("user login failed, userAccount cannot match userPassword");
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在或密码错误");
-        }
-        if (user.getStatus().equals(UserAccountStatusEnum.BAN.getValue())) {
-            throw new BusinessException(ErrorCode.PROHIBITED, "账号已封禁");
-        }
-
-        UserVO userVO = new UserVO();
-        BeanUtils.copyProperties(user, userVO);
-        BeanUtils.copyProperties(userInfoDTO, userVO);
-        return userVO;
-    }
-
-    /**
      * 用户登录
      *
      * @param userAccount  用户账户
@@ -117,12 +80,11 @@ public class ExApiUserAggregate {
      * @return 脱敏后的用户信息
      */
     public UserVO userLogin(String userAccount, String userPassword, HttpServletRequest request) {
-        // 刷新登陆信息
-        UserVO userVO = refreshUserLogin();
-        if (Objects.nonNull(userVO)) {
-            return userVO;
+        // 如果已经登陆，直接返回
+        if(StpUtil.isLogin()) {
+            return this.getLoginUser();
         }
-        userVO = new UserVO();
+        UserVO userVO = new UserVO();
 
         // 1. 校验
         if (StringUtils.isAnyBlank(userAccount, userPassword)) {
@@ -180,5 +142,14 @@ public class ExApiUserAggregate {
      */
     public void userLogout() {
         StpUtil.logout();
+    }
+
+    /**
+     * 获取用户
+     *
+     * @return {@link RestResponse}<{@link UserVO}>
+     */
+    public UserVO getLoginUser() {
+        return apiUserService.getUser();
     }
 }

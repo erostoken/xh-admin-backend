@@ -593,6 +593,34 @@ public class ApiUserServiceImpl extends ServiceImpl<ApiUserMapper, ApiUser>
                 .eq(ApiUserPointRecord::getUserId, userId));
     }
 
+    @Override
+    public UserVO getUser() {
+        // 获取sa token用户信息
+        ExUserInfoDTO userInfoDTO = StpUtil.getTokenSession().getModel(LoginUtil.EX_USER_KEY, ExUserInfoDTO.class);
+        if (Objects.isNull(userInfoDTO) || StringUtils.isBlank(userInfoDTO.getUserKey())) {
+            StpUtil.getTokenSession().delete(LoginUtil.EX_USER_KEY);
+            return null;
+        }
+
+        // 获取用户
+        ApiUser user = this.lambdaQuery()
+                .eq(ApiUser::getUserAccount, userInfoDTO.getUserKey())
+                .one();
+        // 用户不存在
+        if (user == null) {
+            log.info("user login failed, userAccount cannot match userPassword");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在或密码错误");
+        }
+        if (user.getStatus().equals(UserAccountStatusEnum.BAN.getValue())) {
+            throw new BusinessException(ErrorCode.PROHIBITED, "账号已封禁");
+        }
+
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(user, userVO);
+        BeanUtils.copyProperties(userInfoDTO, userVO);
+        return userVO;
+    }
+
     /**
      * 生成随机字符串
      *
