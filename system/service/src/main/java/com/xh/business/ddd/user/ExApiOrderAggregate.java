@@ -2,6 +2,8 @@ package com.xh.business.ddd.user;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.xh.business.ddd.pay.PayService;
+import static com.xh.business.domain.enums.PayTypeStatusEnum.ALIPAY;
+import static com.xh.business.domain.enums.PayTypeStatusEnum.WX;
 import com.xh.business.domain.enums.PaymentStatusEnum;
 import com.xh.business.domain.enums.ProductTypeStatusEnum;
 import com.xh.business.domain.model.ApiProductInfo;
@@ -16,6 +18,7 @@ import com.xh.business.utils.RedissonLockUtil;
 import com.xh.common.core.dto.ExUserInfoDTO;
 import com.xh.common.core.utils.LoginUtil;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -82,5 +85,23 @@ public class ExApiOrderAggregate {
             // 保存订单,返回vo信息
             return payService.saveProductOrder(productId, loginUser);
         });
+    }
+
+    /**
+     * 解析订单通知结果
+     * 通知频率为15s/15s/30s/3m/10m/20m/30m/30m/30m/60m/3h/3h/3h/6h/6h - 总计 24h4m
+     *
+     * @param notifyData 通知数据
+     * @param request    请求
+     * @return {@link String}
+     */
+    public String doOrderNotify(String notifyData, HttpServletRequest request) {
+        String payType;
+        if (notifyData.startsWith("gmt_create=") && notifyData.contains("gmt_create") && notifyData.contains("sign_type") && notifyData.contains("notify_type")) {
+            payType = ALIPAY.getValue();
+        } else {
+            payType = WX.getValue();
+        }
+        return this.getProductOrderServiceByPayType(payType).doPaymentNotify(notifyData, request);
     }
 }

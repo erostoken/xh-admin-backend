@@ -23,4 +23,9 @@ public class PointsConstant {
      */
     public static final String DAILY_SIGN_IN = "每日签到";
 
+    /**
+     * 用户充值
+     */
+    public static final String USER_RECHARGE = "用户充值";
+
 }

@@ -43,7 +43,6 @@ public class UserVO extends ExUserInfoDTO implements Serializable {
     /**
      * 钱包余额（分）
      */
-    @MoneyFormat
     private Long balance;
 
     /**

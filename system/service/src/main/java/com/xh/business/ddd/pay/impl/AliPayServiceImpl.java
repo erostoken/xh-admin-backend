@@ -23,10 +23,11 @@ import com.xh.business.ddd.pay.PayService;
 import static com.xh.business.domain.constant.PayConstant.ORDER_PREFIX;
 import static com.xh.business.domain.constant.PayConstant.RESPONSE_CODE_SUCCESS;
 import static com.xh.business.domain.constant.PayConstant.TRADE_SUCCESS;
+import com.xh.business.domain.constant.PointsConstant;
 import com.xh.business.domain.dto.alipay.AliPayAsyncRespDTO;
 import com.xh.business.domain.dto.pay.PaymentInfoDTO;
 import com.xh.business.domain.enums.AlipayTradeStatusEnum;
-import static com.xh.business.domain.enums.ImageStatusEnum.SUCCESS;
+import static com.xh.business.domain.enums.PaymentStatusEnum.SUCCESS;
 import static com.xh.business.domain.enums.PayTypeStatusEnum.ALIPAY;
 import static com.xh.business.domain.enums.PaymentStatusEnum.CLOSED;
 import static com.xh.business.domain.enums.PaymentStatusEnum.NOTPAY;
@@ -354,7 +355,7 @@ public class AliPayServiceImpl implements PayService {
         // 更新订单状态
         boolean updateOrderStatus = apiProductOrderServiceImpl.updateOrderStatusByOrderNo(outTradeNo, SUCCESS.getValue());
         // 更新用户积分
-        boolean addWalletBalance = userService.addWalletBalance(productOrder.getUserId(), productOrder.getAddPoints());
+        boolean addWalletBalance = userService.addWalletBalance(productOrder.getUserId(), productOrder.getAddPoints(), PointsConstant.USER_RECHARGE);
         // 保存支付记录
         PaymentInfoDTO paymentInfoDTO = new PaymentInfoDTO();
         paymentInfoDTO.setAppid(response.getAppId());

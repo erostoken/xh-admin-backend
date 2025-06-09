@@ -45,4 +45,5 @@ public class AliPayAccountConfig {
      * 卖家id
      */
     private String sellerId;
+
 }
