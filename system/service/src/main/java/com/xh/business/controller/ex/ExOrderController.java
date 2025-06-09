@@ -70,6 +70,30 @@ public class ExOrderController {
      * @return {@link RestResponse}<{@link ProductOrderVO}>
      */
     @PostMapping("/create/product")
+    public RestResponse<ProductOrderVO> createProductOrderV2(@RequestBody ProductOrderCreateRequest productOrderCreateRequest, HttpServletRequest request) {
+        if (ObjectUtils.anyNull(productOrderCreateRequest) || StringUtils.isBlank(productOrderCreateRequest.getProductId())) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        Long productId = Long.valueOf(productOrderCreateRequest.getProductId());
+        String payType = productOrderCreateRequest.getPayType();
+        if (StringUtils.isBlank(payType)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "暂无该支付方式");
+        }
+        ProductOrderVO productOrderVO = exApiOrderAggregate.createProductByPayType(productId, payType);
+        if (productOrderVO == null) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "订单创建失败，请稍后再试");
+        }
+        return RestResponse.success(productOrderVO);
+    }
+
+    /**
+     * 创建订单
+     *
+     * @param request          要求
+     * @param productOrderCreateRequest 付款创建请求
+     * @return {@link RestResponse}<{@link ProductOrderVO}>
+     */
+    @PostMapping("/create/product")
     public RestResponse<ProductOrderVO> createProductOrder(@RequestBody ProductOrderCreateRequest productOrderCreateRequest, HttpServletRequest request) {
         if (ObjectUtils.anyNull(productOrderCreateRequest) || StringUtils.isBlank(productOrderCreateRequest.getProductId())) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);

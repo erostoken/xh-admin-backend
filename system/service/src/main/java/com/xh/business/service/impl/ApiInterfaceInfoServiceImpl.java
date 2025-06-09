@@ -1,12 +1,16 @@
 package com.xh.business.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xh.business.domain.model.ApiInterfaceInfo;
+import com.xh.business.domain.req.interfaceinfo.InterfaceInfoQueryRequest;
+import com.xh.business.domain.resp.api.InterfaceInfoVO;
 import com.xh.business.mapper.ApiInterfaceInfoMapper;
 import com.xh.business.service.ApiInterfaceInfoService;
 import com.xh.business.utils.BusinessException;
 import com.xh.business.utils.ErrorCode;
+import java.util.List;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -66,6 +70,11 @@ public class ApiInterfaceInfoServiceImpl extends ServiceImpl<ApiInterfaceInfoMap
         invokeLambdaUpdateWrapper.eq(ApiInterfaceInfo::getId, interfaceId);
         invokeLambdaUpdateWrapper.setSql("totalInvokes = totalInvokes + 1");
         return this.update(invokeLambdaUpdateWrapper);
+    }
+
+    @Override
+    public List<InterfaceInfoVO> applyInterfaceList(Page<InterfaceInfoVO> page, InterfaceInfoQueryRequest interfaceInfoQueryRequest) {
+        return this.getBaseMapper().applyInterfaceList(page, interfaceInfoQueryRequest);
     }
 
 }

@@ -9,6 +9,7 @@ import com.xh.common.core.dto.SysMenuDTO;
 import com.xh.common.core.entity.SysLog;
 import com.xh.common.core.utils.CommonUtil;
 import com.xh.common.core.utils.LoginUtil;
+import static com.xh.common.core.utils.LoginUtil.SYS_USER_KEY;
 import com.xh.common.core.web.RestResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -73,7 +74,7 @@ public class CommonService extends BaseServiceImpl {
         sysLog.setEndTime(LocalDateTime.now());
         sysLog.setTime(ChronoUnit.MILLIS.between(sysLog.getStartTime(), sysLog.getEndTime()));
         try {
-            if (StpUtil.isLogin()) {
+            if (StpUtil.isLogin() && LoginUtil.hasTokenSessionLogin(SYS_USER_KEY)) {
                 OnlineUserDTO onlineUserDTO = LoginUtil.getOnlineUserInfo();
                 sysLog.setLocale(onlineUserDTO.getLocale());
                 sysLog.setLocaleLabel(onlineUserDTO.getLocaleLabel());

@@ -98,11 +98,11 @@ public class MyFilter extends HttpFilter {
 
         boolean hit = SaRouter
                 .notMatch(ignored -> request.getRequestURI().endsWith("/query"))
+                .notMatch(ignored -> request.getRequestURI().startsWith("/api/ex"))
                 .notMatch(
                         "/api/system/log/get/**",
                         "/api/system/user/queryOnlineUser",
                         "/api/file/operation/download",
-                        "/api/ex/**/*",
                         "/api/system/user/queryUserGroupList"
                 )
                 .notMatchMethod("OPTIONS")

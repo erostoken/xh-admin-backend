@@ -15,6 +15,20 @@ public class LoginUtil {
     public final static String EX_USER_KEY = "exUserInfo";
     public final static String WX_USER_KEY = "wxUserInfo";
 
+    public static boolean hasLogin() {
+        return StpUtil.isLogin();
+    }
+
+
+    public static boolean hasSessionLogin(String key) {
+        return StpUtil.isLogin() && StpUtil.getSession().has(key);
+    }
+
+
+    public static boolean hasTokenSessionLogin(String key) {
+        return StpUtil.isLogin() && StpUtil.getTokenSession().has(key);
+    }
+
     /**
      * 获取当前系统登录信息
      */

@@ -1,22 +1,25 @@
-package com.xh.business.domain.model;
+package com.xh.business.domain.resp.api;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import java.util.Date;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
- * 接口信息
- * @TableName api_interface_info
+ * @author xuwentao
+ * @version 1.0
+ * @date 2025/6/6
+ * @description 备注信息
  */
-@TableName(value ="api_interface_info")
 @Data
-public class ApiInterfaceInfo {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class InterfaceInfoVO {
     /**
      * id
      */
-    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
@@ -28,11 +31,6 @@ public class ApiInterfaceInfo {
      * 接口地址
      */
     private String url;
-
-    /**
-     * 分类代码
-     */
-    private String categoryCode;
 
     /**
      * 发布人
@@ -58,21 +56,6 @@ public class ApiInterfaceInfo {
      * 扣除积分数
      */
     private Long reduceScore;
-
-    /**
-     * 请求示例
-     */
-    private String requestExample;
-
-    /**
-     * 请求头
-     */
-    private String requestHeader;
-
-    /**
-     * 响应头
-     */
-    private String responseHeader;
 
     /**
      * 返回格式(JSON等等)
@@ -104,13 +87,9 @@ public class ApiInterfaceInfo {
      */
     private Date createTime;
 
+    // 业务字段
     /**
-     * 更新时间
+     * 申请状态（0- 申请中 1- 已通过 2- 已驳回）
      */
-    private Date updateTime;
-
-    /**
-     * 是否删除
-     */
-    private Integer isDelete;
+    private Integer applyStatus;
 }

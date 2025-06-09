@@ -20,6 +20,8 @@ import com.xh.common.core.web.DeleteRequest;
 import com.xh.common.core.web.IdRequest;
 import com.xh.common.core.web.PageQuery;
 import com.xh.common.core.web.RestResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -43,6 +45,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/productInfo")
 @Slf4j
+@Tag(name = "API产品")
 public class ProductInfoController {
 
     @Resource
@@ -54,12 +57,12 @@ public class ProductInfoController {
 
     /**
      * 添加接口信息
-     * 创建
      *
      * @param productInfoAddRequest 接口信息添加请求
      * @param request               请求
      * @return {@link RestResponse}<{@link Long}>
      */
+    @Operation(description = "添加产品信息")
     @PostMapping("/add")
     public RestResponse<Long> addProductInfo(@RequestBody ProductInfoAddRequest productInfoAddRequest, HttpServletRequest request) {
         if (productInfoAddRequest == null) {
@@ -86,6 +89,7 @@ public class ProductInfoController {
      * @param request       请求
      * @return {@link RestResponse}<{@link Boolean}>
      */
+    @Operation(description = "删除产品信息")
     @PostMapping("/delete")
     public RestResponse<Boolean> deleteProductInfo(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
         if (ObjectUtils.anyNull(deleteRequest, deleteRequest.getId()) || deleteRequest.getId() <= 0) {
@@ -114,6 +118,7 @@ public class ProductInfoController {
      * @param request                  请求
      * @return {@link RestResponse}<{@link Boolean}>
      */
+    @Operation(description = "更新产品信息")
     @PostMapping("/update")
     @Transactional(rollbackFor = Exception.class)
     public RestResponse<Boolean> updateProductInfo(@RequestBody ProductInfoUpdateRequest productInfoUpdateRequest,
@@ -147,6 +152,7 @@ public class ProductInfoController {
      * @param id id
      * @return {@link RestResponse}<{@link ApiProductInfo}>
      */
+    @Operation(description = "通过id获取产品信息")
     @GetMapping("/get")
     public RestResponse<ApiProductInfo> getProductInfoById(long id) {
         if (id <= 0) {
@@ -182,6 +188,7 @@ public class ProductInfoController {
      * @param request                 请求
      * @return {@link RestResponse}<{@link Page}<{@link ApiProductInfo}>>
      */
+    @Operation(description = "分页获取列表")
     @PostMapping("/list/page")
     public RestResponse<Page<ApiProductInfo>> listProductInfoByPage(@RequestBody PageQuery<ProductInfoQueryRequest> pageQuery, HttpServletRequest request) {
         ProductInfoQueryRequest productInfoQueryRequest = pageQuery.getParam();
@@ -250,6 +257,7 @@ public class ProductInfoController {
      * @param idRequest id请求
      * @return {@link RestResponse}<{@link Boolean}>
      */
+    @Operation(description = "发布")
     @PostMapping("/online")
     public RestResponse<Boolean> onlineProductInfo(@RequestBody IdRequest idRequest) {
         if (ObjectUtils.anyNull(idRequest, idRequest.getId()) || idRequest.getId() <= 0) {
@@ -270,6 +278,7 @@ public class ProductInfoController {
      * @param idRequest id请求
      * @return {@link RestResponse}<{@link Boolean}>
      */
+    @Operation(description = "下线")
     @PostMapping("/offline")
     public RestResponse<Boolean> offlineProductInfo(@RequestBody IdRequest idRequest) {
         if (ObjectUtils.anyNull(idRequest, idRequest.getId()) || idRequest.getId() <= 0) {

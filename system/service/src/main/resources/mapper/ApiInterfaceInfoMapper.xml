@@ -32,4 +32,34 @@
         return_format,description,status,total_invokes,avatar_url,
         create_time,update_time,is_delete
     </sql>
+
+    <select id="applyInterfaceList" resultType="com.xh.business.domain.resp.api.InterfaceInfoVO">
+        SELECT
+            aii.id,
+            aii.name,
+            aii.url,
+            aii.avatar_url,
+            aii.method,
+            aii.request_params,
+            aii.response_params,
+            aii.reduce_score,
+            aii.return_format,
+            aii.description,
+            aii.status,
+            aii.total_invokes,
+            aii.create_time
+        FROM  api_user_interface_apply AS aui
+            INNER JOIN api_interface_info AS aii ON aui.interface_id = aii.id AND aii.is_delete = 0
+        WHERE aui.apply_id = #{param.applyUserId} AND aui.is_delete = 0
+        <if test="param.applyStatus != null">
+            AND aui.status = #{param.applyStatus}
+        </if>
+        <if test="param.categoryCode != null and categoryCode != ''">
+            AND aii.category_code = #{param.categoryCode}
+        </if>
+        <if test="param.keyword != null and param.keyword != ''">
+            AND (aii.name LIKE CONCAT('%',#{param.keyword},'%') OR aii.url LIKE CONCAT('%',#{param.keyword},'%'))
+        </if>
+    </select>
+
 </mapper>

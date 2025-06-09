@@ -1,7 +1,11 @@
 package com.xh.business.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xh.business.domain.model.ApiInterfaceInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.xh.business.domain.req.interfaceinfo.InterfaceInfoQueryRequest;
+import com.xh.business.domain.resp.api.InterfaceInfoVO;
+import java.util.List;
 
 /**
 * @author apple
@@ -26,4 +30,13 @@ public interface ApiInterfaceInfoService extends IService<ApiInterfaceInfo> {
      */
     boolean updateTotalInvokes(long interfaceId);
 
+    /**
+     * 获取申请接口列表
+     *
+     * @param page                      分页参数
+     * @param interfaceInfoQueryRequest 查询参数
+     * @return 列表
+     */
+    List<InterfaceInfoVO> applyInterfaceList(Page<InterfaceInfoVO> page,
+                                             InterfaceInfoQueryRequest interfaceInfoQueryRequest);
 }

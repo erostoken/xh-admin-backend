@@ -81,7 +81,7 @@ public class ExApiUserAggregate {
      */
     public UserVO userLogin(String userAccount, String userPassword, HttpServletRequest request) {
         // 如果已经登陆，直接返回
-        if(StpUtil.isLogin()) {
+        if(StpUtil.isLogin() && StpUtil.getTokenSession().has(LoginUtil.EX_USER_KEY)) {
             return this.getLoginUser();
         }
         UserVO userVO = new UserVO();

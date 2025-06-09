@@ -18,12 +18,6 @@ spring:
       password: local123
       configuration:
         maximum-pool-size: 20
-#    second:
-#      url: jdbc:postgresql://localhost:5432/bms
-#      username: postgres
-#      password: 123456
-#      configuration:
-#        maximum-pool-size: 20
   data:
     redis:
       host: localhost
@@ -77,15 +71,15 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   mapper-locations: classpath*:mapper/**/*.xml
 
-# 支付宝支付配置 todo
+# 支付宝支付配置
 alipay:
-  appId: 2019xxx41568
-  sellerId: 20xxx90687
+  appId: 9021000149648583
+  sellerId: 2088721069739774
   #是否沙箱环境
-  sandbox: false
+  sandbox: true
   #本地测试用内网穿透，这个内网穿透地址，修改为自己的。上线修改为后端的接口地址即可
   notifyUrl: https://beloved-massive-sheepdog.ngrok-free.app/api/order/notify/order
   #支付成功后跳转地址,上线修改为上线任意地址
   returnUrl: http://localhost:8000/account/center
-  private-key: xxxxxxxxxx
-  ali-pay-public-key: xxxxxxxxxxxxxxxx
+  private-key: MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCiGlMsuf2Joei0uC2lJLoi6wxDnp1y5AsvERF2VNb4vrPqJRCwC5jELl0IvRqY6jxM3MruS2bsxkIcsY4XhMFvLkxecOzPl72NH5jve6uX2Z6+gxvUCmyYjY2HfBaVwl88WNV/8O0/16rpDmC6j45ODvHgIK/mURe/JGlJ6hpLXkHA2R3vbqHUxbAqNcJG0GxKd+FkOsZwOIh5vx9pH2m4G7M2e3S3WzIkiJ9PF3jd0WF2ZYrvkC8RueOOeQQAYYG9me/s9xhI+4PbET9mCyaxlV66f2035RB9Mc05ccgL2VmUkAFqeal7vahBDSon/p7ONzy38Jzu0a4k/PQy3ANjAgMBAAECggEAWU8dohe6iviMJ/0NEN5COvi64gpifqkLTFwf/czSP2t53jebkRJikTtmAGmHXNY4cLR4jX83bp3wULS2L1jx5ZphcurOXbUhNr5A2TiOmnPIVPgQ/ercV9QtNIb2Pn4/UBU1U27el3zv6cUFH+P1qCXttujrYH4vEh0ycQmsgPbE/Y4aoLORpXIsKPd5AHiqDH+V04kPBShIwwTKP0cjLD7W2tqq7wnGNTwY0DpH7Y7jiA/YYsOSWxQo/p5z7tqlcERuMfUAenEt+ZNsmcEc4XD9+U3w5ifUFqEFvdPasBeu6hGDHQaHV0CO6L9eOa98K5BmLP3WAgWz85Opr7nm8QKBgQDeI4cPjH/Omb/167fSTqsq9O25Y+Wt1UQxeKIhaupiKZc4MkOpjz8JNWCHcSB96BxPz5XnvvmUkPC/dKtHnz3ACsWxz/o5pDIoaqWqgi12rc4kUa1u8XQSwg07VzdNDh4f164Ihu25O8HRRr65VkyVmo1Y2jPhyNg86gZUc9NtSwKBgQC60Acey0+hScj9baZ/7QQ7tBhSyfA+VHEeNgPkPAIeroPHJPaPROs8pPp9YUHmTsJtCuQyBXldBU8dJaQOg+74H069s+tKWGah7hadA5a9eY0//oqNdwKThN4pxH7lSQ2j3P9fke+NCJNo0VLzPXAOnHUbSxY4tPJx0ut4MfrrSQKBgQC1bx8pPABHppx7KAQD6e00MMjZ2xYFXWNNZNJHqSO2+XFhnOxW2YEK7GXjOirnq2U0asBtgDYpehiox4n9/bpZ2HKQQOaHney5xiF5msm3XU45q9yT+PJtP8G+7gVlElrYdzjWDh6sZHpxi+7LQglbR9ia8d3eVEUJu7tfzxqo8QKBgQCcwFdpKHHNxUroE6zE5M1Lh4dtWFLFCjfMgMhtJ0kkE40xebuFZe/49/nTYNtZ87ZCpwPpURyPyBelPmNVZrEK88IvfZuty1V7BHtnDo7at/akvuHlZ/n6bF+6Lk3H+K+AUrzZpWubLJn8NsBip6eyKug8mZmwxWw1xCSeu1lvOQKBgQCLLoKSB89l+LxEm3TV7w15sN/dT4jgVsXYZWM7EdTJuNKqM6El3PgSZpRyZQ/6FwTWk/YMlHeigF8cLbnpwUdqfJP8DWLZOWC8PBHNFFGl7/QLVP+f0WYFbDBLs7yQtus7gfJGmMseflt2l/mcpqrlqKFEm/ZphIByvuJ2ITprcw==
+  ali-pay-public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAohpTLLn9iaHotLgtpSS6IusMQ56dcuQLLxERdlTW+L6z6iUQsAuYxC5dCL0amOo8TNzK7ktm7MZCHLGOF4TBby5MXnDsz5e9jR+Y73url9mevoMb1ApsmI2Nh3wWlcJfPFjVf/DtP9eq6Q5guo+OTg7x4CCv5lEXvyRpSeoaS15BwNkd726h1MWwKjXCRtBsSnfhZDrGcDiIeb8faR9puBuzNnt0t1syJIifTxd43dFhdmWK75AvEbnjjnkEAGGBvZnv7PcYSPuD2xE/ZgsmsZVeun9tN+UQfTHNOXHIC9lZlJABanmpe72oQQ0qJ/6ezjc8t/Cc7tGuJPz0MtwDYwIDAQAB

@@ -44,7 +44,7 @@ public class ExUserController {
      * @param captchaKey 验证码密钥
      * @return {@link RestResponse}<{@link ImageCaptchaDTO}>
      */
-    @SaIgnore
+//    @SaIgnore
     @Operation(description = "获取图形验证码")
     @GetMapping("/captcha")
     public RestResponse<ImageCaptchaDTO> getImageCaptcha(String captchaKey) {

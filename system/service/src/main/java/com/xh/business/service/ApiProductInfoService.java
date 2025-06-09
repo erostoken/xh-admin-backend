@@ -19,13 +19,4 @@ public interface ApiProductInfoService extends IService<ApiProductInfo> {
      * @param productInfo 产品信息
      */
     void validProductInfo(ApiProductInfo productInfo, boolean add);
-
-    /**
-     * 创建订单
-     *
-     * @param productId 产品id
-     * @param payType   支付方式
-     * @return 订单信息
-     */
-    ProductOrderVO createOrderByPayType(Long productId, String payType);
 }

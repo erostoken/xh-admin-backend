@@ -597,10 +597,6 @@ public class ApiUserServiceImpl extends ServiceImpl<ApiUserMapper, ApiUser>
     public UserVO getUser() {
         // 获取sa token用户信息
         ExUserInfoDTO userInfoDTO = StpUtil.getTokenSession().getModel(LoginUtil.EX_USER_KEY, ExUserInfoDTO.class);
-        if (Objects.isNull(userInfoDTO) || StringUtils.isBlank(userInfoDTO.getUserKey())) {
-            StpUtil.getTokenSession().delete(LoginUtil.EX_USER_KEY);
-            return null;
-        }
 
         // 获取用户
         ApiUser user = this.lambdaQuery()

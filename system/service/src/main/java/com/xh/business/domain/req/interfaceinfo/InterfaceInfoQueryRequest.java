@@ -12,11 +12,27 @@ import lombok.EqualsAndHashCode;
  * @Version: 1.0
  * @Description: 查询请求
  */
-@EqualsAndHashCode(callSuper = true)
 @Data
-public class InterfaceInfoQueryRequest extends PageQuery implements Serializable {
+public class InterfaceInfoQueryRequest implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     * 关键词 包括名称、描述
+     */
+    private String keyword;
+    /**
+     * 分类ID
+     */
+    private String categoryCode;
+    /**
+     * 申请状态（0- 申请中 1- 已通过 2- 已驳回）
+     */
+    private Integer applyStatus;
+    /**
+     * 申请人
+     */
+    private Long applyUserId;
     /**
      * 接口名称
      */

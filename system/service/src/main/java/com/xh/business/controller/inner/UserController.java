@@ -37,6 +37,8 @@ import com.xh.common.core.web.DeleteRequest;
 import com.xh.common.core.web.IdRequest;
 import com.xh.common.core.web.PageQuery;
 import com.xh.common.core.web.RestResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -68,6 +70,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/user")
 @Slf4j
+@Tag(name = "API用户")
 public class UserController {
     @Resource
     private EmailConfig emailConfig;
@@ -223,6 +226,7 @@ public class UserController {
      * @param request        请求
      * @return {@link RestResponse}<{@link Long}>
      */
+    @Operation(description = "添加用户")
     @PostMapping("/add")
     public RestResponse<Long> addUser(@RequestBody UserAddRequest userAddRequest, HttpServletRequest request) {
         if (userAddRequest == null) {
@@ -249,6 +253,7 @@ public class UserController {
      * @param userPointsRequest 用户添加请求
      * @return {@link RestResponse}<{@link Boolean}>
      */
+    @Operation(description = "积分变更")
     @PostMapping("/points/change")
     public RestResponse<Boolean> pointsChange(@RequestBody UserPointsRequest userPointsRequest) {
         if (userPointsRequest == null) {
@@ -263,6 +268,7 @@ public class UserController {
      * @param userQueryRequest 用户积分请求
      * @return {@link RestResponse}<{@link Page}<{@link ApiUserPointRecord}>>
      */
+    @Operation(description = "用户积分分页")
     @PostMapping("/points/page")
     public RestResponse<Page<ApiUserPointRecord>> pointsPage(@RequestBody PageQuery<UserQueryRequest> userQueryRequest) {
         if (ObjectUtils.anyNull(userQueryRequest, userQueryRequest.getParam(), userQueryRequest.getParam().getId())) {
@@ -278,6 +284,7 @@ public class UserController {
      * @param request       请求
      * @return {@link RestResponse}<{@link Boolean}>
      */
+    @Operation(description = "删除用户")
     @PostMapping("/delete")
     public RestResponse<Boolean> deleteUser(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
         if (ObjectUtils.anyNull(deleteRequest, deleteRequest.getId()) || deleteRequest.getId() <= 0) {
@@ -292,6 +299,7 @@ public class UserController {
      * @param userUpdateRequest 用户更新请求
      * @return {@link RestResponse}<{@link ApiUser}>
      */
+    @Operation(description = "更新用户")
     @PostMapping("/update")
     @Transactional(rollbackFor = Exception.class)
     public RestResponse<UserVO> updateUser(@RequestBody UserUpdateRequest userUpdateRequest) {
@@ -336,6 +344,7 @@ public class UserController {
      * @param request 请求
      * @return {@link RestResponse}<{@link UserVO}>
      */
+    @Operation(description = "根据 id 获取用户")
     @GetMapping("/get")
     public RestResponse<UserVO> getUserById(@RequestParam int id, HttpServletRequest request) {
         if (id <= 0) {
@@ -354,6 +363,7 @@ public class UserController {
      * @param request          请求
      * @return {@link RestResponse}<{@link List}<{@link UserVO}>>
      */
+    @Operation(description = "获取用户列表")
     @GetMapping("/list")
     public RestResponse<List<UserVO>> listUser(UserQueryRequest userQueryRequest, HttpServletRequest request) {
         if (null == userQueryRequest) {
@@ -379,6 +389,7 @@ public class UserController {
      * @param request          请求
      * @return {@link RestResponse}<{@link Page}<{@link UserVO}>>
      */
+    @Operation(description = "分页获取用户列表")
     @PostMapping("/list/page")
     public RestResponse<Page<UserVO>> listUserByPage(@RequestBody PageQuery<UserQueryRequest> userQueryRequest, HttpServletRequest request) {
         ApiUser userQuery = new ApiUser();
@@ -452,6 +463,7 @@ public class UserController {
      * @param idRequest id请求
      * @return {@link RestResponse}<{@link Boolean}>
      */
+    @Operation(description = "解封")
     @PostMapping("/normal")
     public RestResponse<Boolean> normalUser(@RequestBody IdRequest idRequest) {
         if (ObjectUtils.anyNull(idRequest, idRequest.getId()) || idRequest.getId() <= 0) {
@@ -473,6 +485,7 @@ public class UserController {
      * @param request   请求
      * @return {@link RestResponse}<{@link Boolean}>
      */
+    @Operation(description = "封号")
     @PostMapping("/ban")
     public RestResponse<Boolean> banUser(@RequestBody IdRequest idRequest, HttpServletRequest request) {
         if (ObjectUtils.anyNull(idRequest, idRequest.getId()) || idRequest.getId() <= 0) {

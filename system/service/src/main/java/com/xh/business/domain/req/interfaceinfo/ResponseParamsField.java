@@ -1,5 +1,6 @@
 package com.xh.business.domain.req.interfaceinfo;
 
+import java.util.List;
 import lombok.Data;
 
 /**
@@ -10,8 +11,32 @@ import lombok.Data;
  */
 @Data
 public class ResponseParamsField {
+    /**
+     * 字段ID
+     */
     private String id;
+    /**
+     * 字段名称
+     */
     private String fieldName;
+    /**
+     * 字段类型
+     */
     private String type;
+    /**
+     * 字段描述
+     */
     private String desc;
+    /**
+     * 是否必填
+     */
+    private String required;
+    /**
+     * 示例
+     */
+    private String example;
+    /**
+     * 子集 - 只有type为object或array时才有值
+     */
+    private List<ResponseParamsField> children;
 }
